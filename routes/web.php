@@ -25,3 +25,11 @@ Route::get('/home', function () {
 Route::get('/logout', function(){
 	Auth::logout();
 });
+
+Route::get('/login', function(){
+
+});
+
+Route::prefix('authentication')->group(function () {
+    Route::post('login', 'UsersController@create');
+});
