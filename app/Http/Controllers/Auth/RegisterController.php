@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
-use App\User;
+use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -68,6 +68,16 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'otp' => '123456',
+            'role_id' => 1,
+            'assured_id' => 1,
+            'language_id' => 1,
+            'country_id' => 1,
+            'state_id' => 1,
+            'address' => '',
+            'land_area' => '',
+            'latitude' => '',
+            'longitude' => '',
         ]);
     }
 }

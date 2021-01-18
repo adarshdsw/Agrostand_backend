@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
@@ -36,5 +39,17 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+    }
+
+    public function mobileLogin(Request $request){
+        $validator = Validator::make($request->all(), [
+            'mobile' => 'required|digits:10|unique:users, mobile',
+        ]);
+
+        if ($validator->fails()) {
+            $responseArr['message'] = $validator->errors();;
+            $responseArr['token'] = '';
+            return response()->json($responseArr, Response::HTTP_BAD_REQUEST);
+        }
     }
 }
