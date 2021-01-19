@@ -104,4 +104,48 @@ class AdminController extends Controller
         }
         return $data;
     }
+
+    public function categoryList(){
+        $category = [];
+        $data = ['status'=> true, 'code'=> 200, 
+        'message'=> 'Category List', 
+        'data'=> $category];
+        return $data;
+    }
+
+    public function subCategorylist(){
+        $category = [];
+        $data = ['status'=> true, 'code'=> 200, 'message'=> 'Sub Category List', 
+        'data'=> $category];
+        return $data;
+    }
+
+    public function newsList(){
+        $category = [];
+        $data = ['status'=> true, 'code'=> 200, 'message'=> 'News List', 
+        'data'=> $category];
+        return $data;
+    }
+
+    public function bannerList(){
+
+        $category = [];
+        $data = ['status'=> true, 'code'=> 200, 'message'=> 'Banner List', 
+        'data'=> $category];
+        return $data;
+    }
+
+    public function commodityList(){
+        $category = [];
+        $data = ['status'=> true, 'code'=> 200, 'message'=> 'Commodity List', 
+        'data'=> $category];
+        return $data;
+    }
+
+    public function govtSchemelist(){
+        $category = [];
+        $data = ['status'=> true, 'code'=> 200, 'message'=> 'Givernment Scheme', 
+        'data'=> $category];
+        return $data;
+    }
 }

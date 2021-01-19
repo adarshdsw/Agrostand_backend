@@ -61,4 +61,10 @@ Route::post('login', 'UsersController@login');
 
 Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 	Route::post('login', 'AdminController@login');
+	Route::get('category', 'AdminController@categoryList');
+	Route::get('sub_category', 'AdminController@subCategorylist');
+	Route::get('news', 'AdminController@newsList');
+	Route::get('banner', 'AdminController@bannerList');
+	Route::get('commodity', 'AdminController@commodityList');
+	Route::get('govt_scheme', 'AdminController@govtSchemelist');
 });
