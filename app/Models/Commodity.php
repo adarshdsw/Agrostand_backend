@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Category;
 
 class Commodity extends Model
 {
@@ -37,4 +38,8 @@ class Commodity extends Model
     protected $dates = [
         'created_at', 'updated_at', 'created_at'
     ];
+
+    public function subcategory(){
+        return $this->belongsTo(Category::class, 'subcategory_id', 'id');
+    }
 }

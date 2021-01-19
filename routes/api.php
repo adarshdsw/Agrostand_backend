@@ -61,10 +61,36 @@ Route::post('login', 'UsersController@login');
 
 Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 	Route::post('login', 'AdminController@login');
-	Route::get('category', 'AdminController@categoryList');
-	Route::get('sub_category', 'AdminController@subCategorylist');
-	Route::get('news', 'AdminController@newsList');
-	Route::get('banner', 'AdminController@bannerList');
-	Route::get('commodity', 'AdminController@commodityList');
-	Route::get('govt_scheme', 'AdminController@govtSchemelist');
+	// category master
+	Route::get('/category', 'CategoryController@categoryList');
+	Route::post('/category/store', 'CategoryController@store');
+	Route::get('/category/edit/{id}', 'CategoryController@edit');
+	Route::put('/category/{id}', 'CategoryController@update');
+	Route::delete('/category/{id}', 'CategoryController@destroy');
+	// subcategory list
+	Route::get('sub_category', 'CategoryController@subCategorylist');
+	// commodity master
+	Route::get('/commodity', 'CommodityController@index');
+	Route::post('/commodity/store', 'CommodityController@store');
+	Route::get('/commodity/edit/{id}', 'CommodityController@edit');
+	Route::put('/commodity/{id}', 'CommodityController@update');
+	Route::delete('/commodity/{id}', 'CommodityController@destroy');
+	// Banner master
+	Route::get('/banners', 'BannerController@index');
+	Route::post('/banner/store', 'BannerController@store');
+	Route::get('/banner/edit/{id}', 'BannerController@edit');
+	Route::put('/banner/{id}', 'BannerController@update');
+	Route::delete('/banner/{id}', 'BannerController@destroy');
+	// news master
+	Route::get('news', 'NewsController@index');
+	Route::post('/news/store', 'NewsController@store');
+	Route::get('/news/edit/{id}', 'NewsController@edit');
+	Route::put('/news/{id}', 'NewsController@update');
+	Route::delete('/news/{id}', 'NewsController@destroy');
+	// Goverement Schemes
+	Route::get('schemes', 'SchemeController@index');
+	Route::post('/scheme/store', 'SchemeController@store');
+	Route::get('/scheme/edit/{id}', 'SchemeController@edit');
+	Route::put('/scheme/{id}', 'SchemeController@update');
+	Route::delete('/scheme/{id}', 'SchemeController@destroy');
 });

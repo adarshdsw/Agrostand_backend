@@ -5,22 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Category extends Model
+class Scheme extends Model
 {
-	use SoftDeletes; // <-- Use This Instead Of SoftDeletingTrait
+    use SoftDeletes; // <-- Use This Instead Of SoftDeletingTrait
     /**
      * The table associated with the model.
      *
      * @var string
      */
-    protected $table = 'categories';
+    protected $table = 'schemes';
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'parent', 'title', 'slug', 'icon', 'status',
+        'title', 'description', 'scheme_date', 'feature_img', 'status',
     ];
 
     /**
@@ -35,11 +35,6 @@ class Category extends Model
      * @var array
      */
     protected $dates = [
-        'created_at', 'updated_at'
+        'created_at', 'updated_at', 'deleted_at'
     ];
-
-    function parent()
-    {
-        return $this->belongsTo(Category::class,'parent', 'id');
-    }
 }
