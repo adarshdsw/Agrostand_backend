@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\UserAddress;
 
 class User extends Authenticatable
 {
@@ -17,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'mobile', 'password', 'user_image', 'otp', 'role_id', 'assured_id', 'language_id', 'device_id', 'status', 'is_new'
+        'name', 'email', 'mobile', 'password','role_id', 'assured_id', 'language_id', 'country_id', 'state_id', 'address', 'land_area', 'latitude', 'longitude', 'otp'
     ];
 
     /**
@@ -37,8 +36,4 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-
-    public function address(){
-        return $this->hasOne(UserAddress::class, 'user_id', 'id');
-    }
 }

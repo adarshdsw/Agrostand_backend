@@ -15,7 +15,7 @@ class AddColumnsToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('mobile', 255)->nullable()->after('password');
-            $table->smallInteger('otp')->after('mobile');
+            $table->smallInteger('otp')->default(0)->after('mobile');
             $table->smallInteger('role_id')->after('otp');
             $table->smallInteger('assured_id')->after('role_id');
             $table->smallInteger('language_id')->after('assured_id');

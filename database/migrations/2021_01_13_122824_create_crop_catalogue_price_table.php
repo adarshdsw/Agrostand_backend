@@ -21,7 +21,7 @@ class CreateCropCataloguePriceTable extends Migration
             $table->float('amount', 8, 2);
             $table->date('last_update');
             $table->timestamps();
-            $table->index(['crop_id']);
+            $table->index('crop_id');
         });
     }
 
