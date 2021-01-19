@@ -347,16 +347,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v6.20.10",
+            "version": "v6.20.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "88dced8fc1016411ca159fc04651baf270aa54e5"
+                "reference": "49f9db00a754517f07d365ee5b0806df82e37029"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/88dced8fc1016411ca159fc04651baf270aa54e5",
-                "reference": "88dced8fc1016411ca159fc04651baf270aa54e5",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/49f9db00a754517f07d365ee5b0806df82e37029",
+                "reference": "49f9db00a754517f07d365ee5b0806df82e37029",
                 "shasum": ""
             },
             "require": {
@@ -492,7 +492,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2021-01-12 15:30:21"
+            "time": "2021-01-15 15:35:47"
         },
         {
             "name": "laravel/tinker",
@@ -4420,16 +4420,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.5.13",
+            "version": "8.5.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "8e86be391a58104ef86037ba8a846524528d784e"
+                "reference": "c25f79895d27b6ecd5abfa63de1606b786a461a3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/8e86be391a58104ef86037ba8a846524528d784e",
-                "reference": "8e86be391a58104ef86037ba8a846524528d784e",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c25f79895d27b6ecd5abfa63de1606b786a461a3",
+                "reference": "c25f79895d27b6ecd5abfa63de1606b786a461a3",
                 "shasum": ""
             },
             "require": {
@@ -4499,7 +4499,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2020-12-01 04:53:52"
+            "time": "2021-01-17 07:37:30"
         },
         {
             "name": "scrivo/highlight.php",
