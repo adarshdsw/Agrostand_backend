@@ -21,7 +21,7 @@ class Commodity extends Model
      * @var array
      */
     protected $fillable = [
-        'category_id', 'title', 'slug', 'icon', 'status',
+        'subcategory_id', 'title', 'slug', 'icon', 'status',
     ];
 
     /**
@@ -40,6 +40,6 @@ class Commodity extends Model
     ];
 
     public function subcategory(){
-        return $this->belongsTo(Category::class, 'subcategory_id', 'id');
+        return $this->belongsTo(Category::class,'subcategory_id', 'id');
     }
 }

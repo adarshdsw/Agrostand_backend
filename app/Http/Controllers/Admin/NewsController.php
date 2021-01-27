@@ -44,6 +44,7 @@ class NewsController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         $news = new News;
         $news->title        = $request->input('title');
         $news->description  = $request->input('description');

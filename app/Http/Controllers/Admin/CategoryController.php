@@ -60,7 +60,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $category = new Category;
-        $category->parent = 0;
+        $category->parent = $request->input('parent');
         $category->title = $request->input('title');
         $category->slug = $request->input('slug');
         $file = $request->file('icon');
@@ -116,7 +116,7 @@ class CategoryController extends Controller
     {
         $category = Category::find($id);
         if($category){
-            $category->parent = 0;
+            $category->parent = $request->input('parent');
             $category->title = $request->input('title');
             $category->slug = $request->input('slug');
             $file = $request->file('icon');

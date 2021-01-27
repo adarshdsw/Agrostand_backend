@@ -54,7 +54,12 @@ Route::post('register', 'UsersController@register');
 Route::post('otpVerify', 'UsersController@otpVerify');
 
 Route::post('login', 'UsersController@login');
-
+// banners list and Details
+Route::get('/banners', 'Admin\BannerController@index')->name('banners');
+// news list and Details
+Route::get('/news', 'Admin\NewsController@index')->name('news');
+// news list and Details
+Route::get('/schemes', 'Admin\SchemeController@index')->name('schemes');
 
 
 /* ----------------------- Admin Routes START -------------------------------- */
