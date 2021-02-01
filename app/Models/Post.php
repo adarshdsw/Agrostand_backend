@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\PostImage;
 use App\Models\PostLike;
@@ -66,6 +67,12 @@ class Post extends Model
     */
     public function favorites(){
     	return $this->hasMany(PostFavorite::class, 'post_id', 'id');
+    }
+    /**
+     * Get the favorites for the blog post.
+    */
+    public function is_favorite(){
+        return $this->hasOne(PostFavorite::class, 'post_id', 'id');
     }
     /**
      * Get the comments for the blog post.

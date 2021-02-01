@@ -17,9 +17,72 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    /*public function index(Request $request)
     {
-        //
+        $offset  = $request->input('offset');
+        $limit   = $request->input('limit');
+        $user_id = $request->input('user_id');
+        $role_id = $request->input('role_id');
+
+        $posts = Post::where('user_id', '!=', $user_id)->offset($offset)->limit($limit)->get();
+        if($posts){
+            $data = [];
+            foreach($posts as $post){
+                $row = [];
+                $row['post'] = $post;
+                $row['user'] = $post->user()->first();
+                $row['post_images'] = $post->postImages()->get();
+                $row['likes'] = $post->likes()->get();
+                $row['comments'] = $post->comments()->get();
+                $row['favorites'] = $post->favorites()->get();
+                // $row['is_fav'] = $post->favorites()->where('user_id', $user_id)->select('favorite')->first();
+                $data[] = $row;
+            }
+            $data = ['status' => true, 'code' => 200, 'data'=>$data];
+        }else{
+            $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
+        }
+        return $data;
+    }*/
+    public function index(Request $request)
+    {
+        $offset  = $request->input('offset');
+        $limit   = $request->input('limit');
+        $user_id = $request->input('user_id');
+        $is_filter = $request->input('is_filter');        
+
+        if(isset($is_filter) && !empty($is_filter)  && $is_filter != '' ){
+            $posts = Post::with(['postImages', 'user', 'likes', 'is_favorite'=>function($q) use($request){
+                $user_id = $request->input('user_id');
+                $q->where('user_id', '=', $user_id);
+            }, 'comments'])
+                ->whereHas('user', function($query) use($request) {
+                    
+                    $role_id = $request->input('role_id');
+                    $assured_id = $request->input('assured_id');
+
+                    if(isset($role_id) && !empty($role_id)  && $role_id != '' && is_numeric($role_id) ){
+                        $query->where('role_id', '=', $role_id);
+                    }
+                    if(isset($assured_id) && !empty($assured_id)  && $assured_id != '' && is_numeric($assured_id) ){
+                        $query->where('assured_id', '=', $assured_id);
+                    }
+                })
+                /*->whereHas('favorites', function($query) use($request){
+                    $user_id = $request->input('user_id');
+                    $query->where('user_id', '=', $user_id);
+                })*/
+                ->where('user_id', '!=' ,$user_id)->get();
+        }else{
+            $posts = Post::with('postImages', 'user', 'likes', 'favorites', 'comments')->where('user_id', '!=' ,$user_id)->get();
+        }
+
+        if($posts){
+            $data = ['status' => true, 'code' => 200, 'data'=>$posts];
+        }else{
+            $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
+        }
+        return $data;
     }
     /**
      * Display a listing of the user own posts

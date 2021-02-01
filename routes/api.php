@@ -71,7 +71,7 @@ Route::get('/news', 'Admin\NewsController@index')->name('news');
 // news list and Details
 Route::get('/schemes', 'Admin\SchemeController@index')->name('schemes');
 // post master
-	Route::get('/posts', 'Api\PostController@index');
+	Route::post('/posts', 'Api\PostController@index');
 	Route::post('/post/store', 'Api\PostController@store');
 	Route::get('/post/show/{id}', 'Api\PostController@show');
 	Route::delete('/post/delete', 'Api\PostController@destroy');

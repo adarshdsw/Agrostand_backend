@@ -581,7 +581,21 @@ class UsersController extends Controller
 	 * @return \Illuminate\Http\Response
 	 */
 	public function userFollowing(Request $request){
-		$post = $request->all(); 
+		$post = $request->all();
+		$user_follow = UserFollower::where('user_id', $post['user_id'])->where('follower_id', $post['follower_id'])->first();
+		if(!$user_follow){
+			$user_follow = new UserFollower();
+		}
+		$user_follow->user_id 		= $post['user_id'];
+		$user_follow->follower_id 	= $post['follower_id'];
+		$user_follow->status 		= $post['status'];
+		$res = $user_follow->save();
+		if($res){
+			$data = ['status' => true, 'code' => 200, 'user_follow' => $user_follow];
+		}else{
+			$data = ['status' => false, 'code' => 500, 'msg'=>'Something went wrong'];
+		}
+		return $data;
 	}
 
 	/**
