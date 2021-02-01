@@ -46,6 +46,8 @@ class BannerController extends Controller
         $banner = new Banner;
         $banner->title = $request->input('title');
         $banner->description = $request->input('description');
+        $banner->title_hindi = $request->input('title_hindi');
+        $banner->description_hindi = $request->input('description_hindi');
         $file = $request->file('feature_img');
         if($file){
             $filename   = $file->getClientOriginalName();
@@ -105,6 +107,8 @@ class BannerController extends Controller
         if($banner){
             $banner->title = $request->input('title');
             $banner->description = $request->input('description');
+            $banner->title_hindi = $request->input('title_hindi');
+            $banner->description_hindi = $request->input('description_hindi');
             $file = $request->file('feature_img');
             if($file){
                 $filename   = $file->getClientOriginalName();

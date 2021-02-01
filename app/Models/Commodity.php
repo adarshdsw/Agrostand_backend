@@ -21,7 +21,7 @@ class Commodity extends Model
      * @var array
      */
     protected $fillable = [
-        'subcategory_id', 'title', 'slug', 'icon', 'status',
+        'subcategory_id', 'title', 'title_hindi', 'slug', 'icon', 'status',
     ];
 
     /**

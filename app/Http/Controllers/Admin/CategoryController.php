@@ -62,6 +62,7 @@ class CategoryController extends Controller
         $category = new Category;
         $category->parent = $request->input('parent');
         $category->title = $request->input('title');
+        $category->title_hindi = $request->input('title_hindi');
         $category->slug = $request->input('slug');
         $file = $request->file('icon');
         if($file){
@@ -118,6 +119,7 @@ class CategoryController extends Controller
         if($category){
             $category->parent = $request->input('parent');
             $category->title = $request->input('title');
+            $category->title_hindi = $request->input('title_hindi');
             $category->slug = $request->input('slug');
             $file = $request->file('icon');
             if($file){

@@ -8,6 +8,12 @@ use App\Models\UserBank;
 use App\Models\UserKyc;
 use App\Models\Category;
 use App\Models\Commodity;
+use App\Models\UserRatting;
+use App\Models\UserCommodity;
+use App\Models\UserBusiness;
+use App\Models\UserEducation;
+use App\Models\UserFollower;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +27,24 @@ class UsersController extends Controller
 		if($languages){
 			$responseArr['status'] = true;
 			$responseArr['data'] = $languages;
+			return response()->json($responseArr, Response::HTTP_OK);
+		}
+	}
+
+	public function assuredList(Request $request){
+		$assures = DB::table('assures')->get();
+		if($assures){
+			$responseArr['status'] = true;
+			$responseArr['data'] = $assures;
+			return response()->json($responseArr, Response::HTTP_OK);
+		}
+	}
+
+	public function roleList(Request $request){
+		$roles = DB::table('roles')->get();
+		if($roles){
+			$responseArr['status'] = true;
+			$responseArr['data'] = $roles;
 			return response()->json($responseArr, Response::HTTP_OK);
 		}
 	}
@@ -39,6 +63,15 @@ class UsersController extends Controller
 		if($categories){
 			$responseArr['status'] = true;
 			$responseArr['data'] = $categories;
+			return response()->json($responseArr, Response::HTTP_OK);
+		}
+	}
+
+	public function brandList(Request $request){
+		$brands = DB::table('brands')->get();
+		if($brands){
+			$responseArr['status'] = true;
+			$responseArr['data'] = $brands;
 			return response()->json($responseArr, Response::HTTP_OK);
 		}
 	}
@@ -205,6 +238,8 @@ class UsersController extends Controller
 		$post = $request->all();
 
 		$user_otp = DB::table('user_otp')->where('user_otp_id', $post['user_otp_id'])->where('is_verify', 0)->first();
+
+		// dd($user_otp);
 		
 		if(!empty($user_otp)){
 			if($user_otp->otp_code == $post['otp_code']){
@@ -217,16 +252,15 @@ class UsersController extends Controller
 				{
 					$user = User::where('mobile', $user_otp->user_mobile)->first();
 					if(empty($user)){
-						/*$user_data['mobile'] = $user_otp->user_mobile;
-						$user_data['language_id'] = 1;
-						$user = User::create($user_data);*/
+						// $user_data['mobile'] = $user_otp->user_mobile;
+						// $user_data['language_id'] = 1;
+						// $user = User::create($user_data);
 						$responseArr['status'] = true;
 						$responseArr['message'] = 'Sucessfully';
 						$responseArr['is_new'] = true;
-						$responseArr['data'] = $user;
+						$responseArr['data'] = '';
 						// $result = ['status' => true, 'code' => 201, 'message' => 'Sucessfully', 'data' => $user, 'is_new' => true];
 						return response()->json($responseArr, Response::HTTP_OK);
-						
 					}else{
 						$responseArr['status'] = true;
 						$responseArr['message'] = 'Sucessfully';
@@ -258,6 +292,7 @@ class UsersController extends Controller
 	public function registerUser(Request $request)
 	{
 		$post = $request->all();
+		// dd($post);
 		$validator = Validator::make($request->all(), [
 			'name' => 'required',
 			'mobile' => 'required|integer|digits:10',
@@ -276,8 +311,12 @@ class UsersController extends Controller
 		$user = User::where('mobile', $post['mobile'])->first();
 		
 		if(empty($user)){
-			$user_data['mobile'] = $post['mobile'];
-			$user_data['role_id'] = 1;
+			$user_data['name'] 		= $post['name'];
+			$user_data['mobile'] 	= $post['mobile'];
+			$user_data['device_id'] = $post['device_id'];
+			$user_data['role_id'] 	= $post['role_id'];
+			$user_data['category_id'] 	= $post['category_id'];
+			$user_data['subcategory_id'] = $post['subcategory_id'];
 			$user_data['assured_id'] = 1;
 			$user_data['is_new'] = '0';
 			$user = User::create($user_data);
@@ -291,10 +330,24 @@ class UsersController extends Controller
 				$user_address['district']   = $post['district'];
 				$user_address['village_town'] = $post['village_town'];
 				$user_address['house_number'] = $post['house_number'];
+				// $user_address['pincode'] 	= $post['pincode'];
 				$user_address['latitude']   = $post['latitude'];
 				$user_address['longitude']  = $post['longitude'];
 				$user_address = UserAddress::create($user_address);
 
+				$commodities_arr = explode(',', $post['commodities_id']);
+				if(!empty($commodities_arr)){
+					$commodity_data = [];
+	                foreach($commodities_arr as $commodity){
+	                    $row = [];
+	                    $row['user_id']   	= $user->id;
+	                    $row['commodity_id'] = $commodity;
+	                    $row['created_at']	= date('Y-m-d H:i:s');
+						$row['updated_at']	= date('Y-m-d H:i:s');
+	                    $commodity_data[]	= $row;
+	                }
+	                UserCommodity::insert($commodity_data);
+				}
 				$responseArr['status'] = true;
 				$responseArr['message'] = 'Sucessfully';
 				$responseArr['data'] = ['user' => $user, 'user_address' => $user_address];
@@ -313,10 +366,11 @@ class UsersController extends Controller
 	}     
 	
 	public function getUserProfile(Request $request){
-		$user = User::find($request->input('user_id'));
+		$user_id = $request->input('user_id');
+		$user = User::with('address', 'kyc', 'bank', 'commodities', 'business', 'education')->where('id', $user_id)->get();
 		$responseArr['status'] = true;
 		$responseArr['message'] = 'Sucessfully';
-		$responseArr['data'] = ["user" => $user, "user_address"=>$user->address->first()];
+		$responseArr['data'] = ["user" => $user];
 		return response()->json($responseArr, Response::HTTP_OK);
 	}
 
@@ -332,7 +386,7 @@ class UsersController extends Controller
 				$user->name 		= $post['name'];
 				$user->email 		= $post['email'];
 				$user->category_id 	= $post['category_id'];
-				$user->commodity_id = $post['commodity_id'];
+				$user->subcategory_id = $post['subcategory_id'];
 				$user->language_id 	= $post['language_id'];
 				
 				$file       = $request->file('user_image');
@@ -345,7 +399,26 @@ class UsersController extends Controller
 	                $user->user_image   = asset('/uploads/user_image/'.$filenew);
 				}
 				// echo "<pre>";print_r($user);die;
-				$user->save();
+				$res = $user->save();
+				
+				if($res){
+					$commodities_arr = explode(',', $post['commodities_id']);
+					if(!empty($commodities_arr)){
+						// delete all old commodities and insert new commodities
+						UserCommodity::where('user_id', $user->id)->delete();
+						$commodity_data = [];
+		                foreach($commodities_arr as $commodity){
+		                    $row = [];
+		                    $row['user_id']   	= $user->id;
+		                    $row['commodity_id'] = $commodity;
+		                    $row['created_at']	= date('Y-m-d H:i:s');
+							$row['updated_at']	= date('Y-m-d H:i:s');
+		                    $commodity_data[]	= $row;
+		                }
+		                UserCommodity::insert($commodity_data);
+					}
+				}
+
 				$responseArr['status'] = true;
 				$responseArr['message'] = 'Sucessfully';
 				$responseArr['data'] = ["user" => $user];
@@ -355,12 +428,21 @@ class UsersController extends Controller
 				$user_address = UserAddress::where('user_id', $user_id)->first();
 				$user_address->address 		= $post['address'];
 				$user_address->land_area 	= $post['land_area'];
+				if($file = $request->file('land_proof_img')){
+	                $filename   = $file->getClientOriginalName();
+	                $name       = "land_proof";
+	                $extension  = $file->extension();
+	                $filenew    =  date('d-M-Y').'_'.str_replace($filename,$name,$filename).'_'.time().''.rand(). "." .$extension;
+	                $file->move(base_path('/public/uploads/user_image'), $filenew);
+	                $user_address->land_proof_img   = asset('/uploads/user_image/'.$filenew);
+				}
 				$user_address->country_id 	= $post['country_id'];
 				$user_address->state_id 	= $post['state_id'];
 				$user_address->city 		= $post['city'];
 				$user_address->district 	= $post['district'];
 				$user_address->village_town = $post['village_town'];
 				$user_address->house_number = $post['house_number'];
+				$user_address->pincode 		= ($post['pincode']) ? $post['pincode'] : 0;
 				$user_address->latitude 	= $post['latitude'];
 				$user_address->longitude 	= $post['longitude'];
 				$user_address->save();
@@ -408,9 +490,98 @@ class UsersController extends Controller
 				$responseArr['message'] = 'Sucessfully';
 				$responseArr['data'] = ["user_bank" => $user_bank];
 				return response()->json($responseArr, Response::HTTP_OK);
+
+			case "business" :
+				$where = ['user_id'=>$user_id];
+				// dd($post);
+				// business data 
+				$business_data['business_name'] 	= $post['business_name'];
+				$business_data['owner_name']   		= $post['owner_name'];
+				$business_data['business_address'] 	= $post['business_address'];
+				$business_data['gstin']  			= $post['gstin'];
+				$business_data['business_contact']  = $post['business_contact'];
+				$business_data['business_email']  	= $post['business_email'];
+				// user business video
+				if($file = $request->file('business_video_url')){
+	                $filename   = $file->getClientOriginalName();
+	                $name       = "business_video";
+	                $extension  = $file->extension();
+	                $filenew    =  date('d-M-Y').'_'.str_replace($filename,$name,$filename).'_'.time().''.rand(). "." .$extension;
+	                $file->move(base_path('/public/uploads/user_image'), $filenew);
+	                $business_data['business_video_url']   = asset('/uploads/user_image/'.$filenew);
+				}
+				// user business image
+				if($file = $request->file('business_image_url')){
+	                $filename   = $file->getClientOriginalName();
+	                $name       = "business_img";
+	                $extension  = $file->extension();
+	                $filenew    =  date('d-M-Y').'_'.str_replace($filename,$name,$filename).'_'.time().''.rand(). "." .$extension;
+	                $file->move(base_path('/public/uploads/user_image'), $filenew);
+	                $business_data['business_image_url']   = asset('/uploads/user_image/'.$filenew);
+				}
+				$user_business = UserBusiness::updateOrCreate($where, $business_data);
+				$responseArr['status'] = true;
+				$responseArr['message'] = 'Sucessfully';
+				$responseArr['data'] = ["user_business" => $user_business];
+				return response()->json($responseArr, Response::HTTP_OK);
+
+			case "education" :
+				$where = ['user_id'=>$user_id];
+				// dd($post);
+				// education data 
+				$education_data['education_name'] 	= $post['education_name'];
+				$education_data['experience']   		= $post['experience'];
+				// user education degree
+				if($file = $request->file('degree_image')){
+	                $filename   = $file->getClientOriginalName();
+	                $name       = "user_degree";
+	                $extension  = $file->extension();
+	                $filenew    =  date('d-M-Y').'_'.str_replace($filename,$name,$filename).'_'.time().''.rand(). "." .$extension;
+	                $file->move(base_path('/public/uploads/user_image'), $filenew);
+	                $education_data['degree_image']   = asset('/uploads/user_image/'.$filenew);
+				}
+				$user_education = UserEducation::updateOrCreate($where, $education_data);
+				$responseArr['status'] = true;
+				$responseArr['message'] = 'Sucessfully';
+				$responseArr['data'] = ["user_education" => $user_education];
+				return response()->json($responseArr, Response::HTTP_OK);
+
 			default:
 				echo "default!";
 		}
+	}
+
+	public function provideUserRatting(Request $request){
+		
+		$user_ratting = new UserRatting();
+
+		$post = $request->all();
+		
+		$user_ratting->user_id 	 = $post['user_id'];
+		$user_ratting->ratting   = isset($post['ratting']) ? $post['ratting'] : '';
+		$user_ratting->ratted_by = $post['ratted_by'];
+		$res = $user_ratting->save();
+		if($res){
+			$user_id = $post['user_id'];
+			$count = UserRatting::where('user_id', $user_id)->count();
+			$sum = UserRatting::where('user_id', $user_id)->sum('ratting');
+			$avg_ratting = round($sum/$count, 2);
+			User::where('id', $user_id)->update(['avg_ratting'=>$avg_ratting]);
+			$data = ['status' => true, 'code' => 200, 'user_ratting_id' => $user_ratting];
+		}else{
+			$data = ['status' => false, 'code' => 500];
+		}
+		return $data;
+	}
+
+	/**
+	 * Store a follow and unfollow  user in storage.
+	 *
+	 * @param  \Illuminate\Http\Request  $request
+	 * @return \Illuminate\Http\Response
+	 */
+	public function userFollowing(Request $request){
+		$post = $request->all(); 
 	}
 
 	/**

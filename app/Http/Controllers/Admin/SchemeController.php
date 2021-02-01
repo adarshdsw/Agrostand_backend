@@ -47,6 +47,8 @@ class SchemeController extends Controller
         $scheme = new Scheme;
         $scheme->title        = $request->input('title');
         $scheme->description  = $request->input('description');
+        $scheme->title_hindi        = $request->input('title_hindi');
+        $scheme->description_hindi  = $request->input('description_hindi');
         $scheme->scheme_date  = $request->input('scheme_date');
         $file = $request->file('feature_img');
         if($file){
@@ -125,6 +127,8 @@ class SchemeController extends Controller
         if($scheme){
             $scheme->title = $request->input('title');
             $scheme->description  = $request->input('description');
+            $scheme->title_hindi        = $request->input('title_hindi');
+            $scheme->description_hindi  = $request->input('description_hindi');
             $scheme->scheme_date    = $request->input('scheme_date');
             $file = $request->file('feature_img');
             if($file){

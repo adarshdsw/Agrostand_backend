@@ -20,7 +20,7 @@ class Scheme extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'description', 'scheme_date', 'feature_img', 'status',
+        'title', 'description', 'scheme_date', 'feature_img', 'status', 'title_hindi' ,'description_hindi'
     ];
 
     /**

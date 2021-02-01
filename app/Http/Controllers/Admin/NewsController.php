@@ -48,6 +48,8 @@ class NewsController extends Controller
         $news = new News;
         $news->title        = $request->input('title');
         $news->description  = $request->input('description');
+        $news->title_hindi        = $request->input('title_hindi');
+        $news->description_hindi  = $request->input('description_hindi');
         $news->news_date    = $request->input('news_date');
         $file = $request->file('feature_img');
         if($file){
@@ -128,6 +130,8 @@ class NewsController extends Controller
         if($news){
             $news->title = $request->input('title');
             $news->description  = $request->input('description');
+            $news->title_hindi        = $request->input('title_hindi');
+            $news->description_hindi  = $request->input('description_hindi');
             $news->news_date    = $request->input('news_date');
             $file = $request->file('feature_img');
             if($file){

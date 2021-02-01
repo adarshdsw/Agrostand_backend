@@ -46,6 +46,7 @@ class CommodityController extends Controller
         $commodity = new Commodity;
         $commodity->subcategory_id = $request->input('subcategory_id');
         $commodity->title = $request->input('title');
+        $commodity->title_hindi = $request->input('title_hindi');
         $commodity->slug = $request->input('slug');
         $file = $request->file('icon');
         if($file){
@@ -106,6 +107,7 @@ class CommodityController extends Controller
         if($commodity){
             $commodity->subcategory_id = $request->input('subcategory_id');
             $commodity->title = $request->input('title');
+            $commodity->title_hindi = $request->input('title_hindi');
             $commodity->slug = $request->input('slug');
             $file = $request->file('icon');
             if($file){

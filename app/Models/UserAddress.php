@@ -19,7 +19,7 @@ class UserAddress extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'address', 'land_area', 'country_id', 'state_id', 'city', 'district', 'village_town', 'house_number', 'latitude', 'longitude'
+        'user_id', 'address', 'land_area', 'country_id', 'state_id', 'city', 'district', 'village_town', 'house_number', 'latitude', 'longitude', 'pincode'
     ];
 
     /**

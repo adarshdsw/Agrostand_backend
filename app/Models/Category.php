@@ -20,7 +20,7 @@ class Category extends Model
      * @var array
      */
     protected $fillable = [
-        'parent', 'title', 'slug', 'icon', 'status',
+        'parent', 'title', 'title_hindi', 'slug', 'icon', 'status',
     ];
 
     /**

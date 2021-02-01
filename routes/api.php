@@ -21,9 +21,15 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::get('languages', 'UsersController@languageList')->name('languages');
 
+Route::get('assured', 'UsersController@assuredList')->name('assured');
+
 Route::get('countries', 'UsersController@countryList')->name('countries');
 
 Route::get('categories', 'UsersController@categoryList')->name('categories');
+
+Route::get('brands', 'UsersController@brandList')->name('brands');
+
+Route::get('roles', 'UsersController@roleList')->name('roles');
 
 Route::post('sub_categories', 'UsersController@subCategoryList')->name('sub_categories');
 
@@ -46,6 +52,10 @@ Route::post('mobile_login', 'Auth\LoginController@mobileLogin');
 Route::post('get_user_profile', 'UsersController@getUserProfile')->name('get_user_profile');
 
 Route::post('update_user_profile', 'UsersController@updateUserProfile')->name('update_user_profile');
+// provide user ratting
+Route::post('/user/provide_ratting', 'UsersController@provideUserRatting')->name('user.provide_ratting');
+// user follower
+Route::post('/user/following', 'UsersController@userFollowing')->name('user.following');
 
 // Route::post('register', 'Auth\RegisterController@register');
 
@@ -60,7 +70,21 @@ Route::get('/banners', 'Admin\BannerController@index')->name('banners');
 Route::get('/news', 'Admin\NewsController@index')->name('news');
 // news list and Details
 Route::get('/schemes', 'Admin\SchemeController@index')->name('schemes');
+// post master
+	Route::get('/posts', 'Api\PostController@index');
+	Route::post('/post/store', 'Api\PostController@store');
+	Route::get('/post/show/{id}', 'Api\PostController@show');
+	Route::delete('/post/delete', 'Api\PostController@destroy');
+	Route::post('/post/view_increment', 'Api\PostController@viewIncrement');
+	Route::post('/post/like', 'Api\PostController@like');
+	Route::post('/post/favorite', 'Api\PostController@favorite');
+	Route::post('/post/comment', 'Api\PostController@comment');
+	// user own posts
+	Route::get('/post/user/{id}', 'Api\PostController@userPosts')->name('user.own.posts');
 
+// product master
+	Route::get('/products', 'Api\ProductController@index');
+	Route::post('/product/store', 'Api\ProductController@store');
 
 /* ----------------------- Admin Routes START -------------------------------- */
 
@@ -98,4 +122,7 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 	Route::get('/scheme/edit/{id}', 'SchemeController@edit');
 	Route::put('/scheme/{id}', 'SchemeController@update');
 	Route::delete('/scheme/{id}', 'SchemeController@destroy');
+	// users list
+	Route::get('users', 'UsersController@index');
+	Route::post('/user/update_status', 'UsersController@updateStatus');
 });
