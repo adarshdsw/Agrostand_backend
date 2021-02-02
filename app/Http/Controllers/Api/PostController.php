@@ -72,9 +72,9 @@ class PostController extends Controller
                     $user_id = $request->input('user_id');
                     $query->where('user_id', '=', $user_id);
                 })*/
-                ->where('user_id', '!=' ,$user_id)->get();
+                ->where('user_id', '!=' ,$user_id)->offset($offset)->limit($limit)->get();
         }else{
-            $posts = Post::with('postImages', 'user', 'likes', 'favorites', 'comments')->where('user_id', '!=' ,$user_id)->get();
+            $posts = Post::with('postImages', 'user', 'likes', 'favorites', 'comments')->where('user_id', '!=' ,$user_id)->offset($offset)->limit($limit)->get();
         }
 
         if($posts){

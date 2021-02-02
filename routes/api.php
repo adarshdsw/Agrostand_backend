@@ -83,7 +83,7 @@ Route::get('/schemes', 'Admin\SchemeController@index')->name('schemes');
 	Route::get('/post/user/{id}', 'Api\PostController@userPosts')->name('user.own.posts');
 
 // product master
-	Route::get('/products', 'Api\ProductController@index');
+	Route::post('/products', 'Api\ProductController@index');
 	Route::post('/product/store', 'Api\ProductController@store');
 
 /* ----------------------- Admin Routes START -------------------------------- */

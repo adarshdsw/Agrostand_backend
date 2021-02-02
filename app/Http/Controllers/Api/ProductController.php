@@ -18,11 +18,15 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
+        $offset  = $request->input('offset');
+        $limit   = $request->input('limit');
+        $user_id = $request->input('user_id');
+
+        $products = Product::where('user_id', $user_id)->offset($offset)->limit($limit)->get();;
         if($products){
-            $data = ['status' => true, 'code' => 200, 'user_ratting_id' => $user_ratting];
+            $data = ['status' => true, 'code' => 200, 'products' => $products];
         }else{
             $data = ['status' => false, 'code' => 500];
         }
@@ -47,6 +51,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        // echo "<pre>";print_r($request->all());die;
         $product = new Product;
         $product->user_id          = $request->input('user_id');
         $product->category_id      = $request->input('category_id');
@@ -69,23 +74,41 @@ class ProductController extends Controller
             $name       = "product";
             $extension  = $file->extension();
             $filenew    =  date('d-M-Y').'_'.str_replace($filename,$name,$filename).'_'.time().''.rand(). "." .$extension;
-            $file->move(base_path('/public/uploads/product'), $filenew);
-            $product->feature_img   = '/uploads/product/'.$filenew;
+            $file->move(base_path('/public/uploads/products'), $filenew);
+            $product->feature_img   = '/uploads/products/'.$filenew;
         }
         // upload product document
         $doc_file = $request->file('document');
         if($doc_file){
-            $filename   = $file->getClientOriginalName();
+            $filename   = $doc_file->getClientOriginalName();
             $name       = "product_doc";
-            $extension  = $file->extension();
+            $extension  = $doc_file->extension();
             $filenew    =  date('d-M-Y').'_'.str_replace($filename,$name,$filename).'_'.time().''.rand(). "." .$extension;
-            $file->move(base_path('/public/uploads/product'), $filenew);
-            $product->feature_img   = '/uploads/product/'.$filenew;
+            $doc_file->move(base_path('/public/uploads/products'), $filenew);
+            $product->document   = '/uploads/products/'.$filenew;
         }
         // $product->views = 0;
         $product->status = $request->input('status');
         $res = $product->save();
         if($res){
+            // product price
+            $product_price = new ProductPrice();
+            $product_price->product_id  = $product->id;
+            $product_price->min_qty     = $request->input('min_qty');
+            $product_price->unit        = $request->input('unit');
+            $product_price->amount      = $request->input('amount');
+            $product_price->last_update = date('Y-m-d');
+            $res = $product_price->save();
+            // product offer
+            $product_offer = new ProductOffer();
+            $product_offer->product_id  = $product->id;
+            $product_offer->offer_name  = $request->input('offer_name');
+            $product_offer->discount    = $request->input('discount');
+            $product_offer->amount      = $request->input('offer_amount');
+            $product_offer->start_offer = $request->input('start_offer');
+            $product_offer->end_offer   = $request->input('end_offer');
+            $product_offer->offer_specification   = $request->input('offer_specification');
+            $res = $product_offer->save();
             return ['status' => true, 'code' => 200, 'data'=>$product];
         }else{
             return ['status' => false, 'code' => 500, 'message' => "something went wrong with database."];
