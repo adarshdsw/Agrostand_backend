@@ -49,13 +49,20 @@ class PostController extends Controller
         $offset  = $request->input('offset');
         $limit   = $request->input('limit');
         $user_id = $request->input('user_id');
-        $is_filter = $request->input('is_filter');        
+        $is_filter = $request->input('is_filter');
+        
+        $total_count = Post::where('user_id', '!=' ,$user_id)->count();
 
         if(isset($is_filter) && !empty($is_filter)  && $is_filter != '' ){
-            $posts = Post::with(['postImages', 'user', 'likes', 'is_favorite'=>function($q) use($request){
-                $user_id = $request->input('user_id');
-                $q->where('user_id', '=', $user_id);
-            }, 'comments'])
+            $posts = Post::with(['postImages', 'user', 'likes', 
+                'is_like' => function($q) use($request){
+                    $user_id = $request->input('user_id');
+                    $q->where('user_id', '=', $user_id);
+                },
+                'is_favorite'=>function($q) use($request){
+                    $user_id = $request->input('user_id');
+                    $q->where('user_id', '=', $user_id);
+                }, 'comments'])
                 ->whereHas('user', function($query) use($request) {
                     
                     $role_id = $request->input('role_id');
@@ -74,11 +81,19 @@ class PostController extends Controller
                 })*/
                 ->where('user_id', '!=' ,$user_id)->offset($offset)->limit($limit)->get();
         }else{
-            $posts = Post::with('postImages', 'user', 'likes', 'favorites', 'comments')->where('user_id', '!=' ,$user_id)->offset($offset)->limit($limit)->get();
+            $posts = Post::with(['postImages', 'user', 'likes', 
+                    'is_like' => function($q) use($request){
+                        $user_id = $request->input('user_id');
+                        $q->where('user_id', '=', $user_id);
+                    },
+                    'is_favorite'=>function($q) use($request){
+                        $user_id = $request->input('user_id');
+                        $q->where('user_id', '=', $user_id);
+                    }, 'comments'])->where('user_id', '!=' ,$user_id)->offset($offset)->limit($limit)->get();
         }
 
         if($posts){
-            $data = ['status' => true, 'code' => 200, 'data'=>$posts];
+            $data = ['status' => true, 'code' => 200, 'data'=>$posts, 'total_count'=>$total_count];
         }else{
             $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
         }
@@ -92,7 +107,7 @@ class PostController extends Controller
     */
     public function userPosts($user_id = null){
         if($user_id){
-            $post = Post::with('postImages', 'user', 'likes', 'favorites', 'comments')->where('user_id', $user_id)->get();
+            $post = Post::with('postImages', 'user', 'likes', 'comments')->where('user_id', $user_id)->get();
             if($post){
                 $data = ['status' => true, 'code' => 200, 'data'=>$post];
             }else{

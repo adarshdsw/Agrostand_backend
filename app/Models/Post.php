@@ -75,10 +75,16 @@ class Post extends Model
         return $this->hasOne(PostFavorite::class, 'post_id', 'id');
     }
     /**
+     * Get the favorites for the blog post.
+    */
+    public function is_like(){
+        return $this->hasOne(PostLike::class, 'post_id', 'id');
+    }
+    /**
      * Get the comments for the blog post.
     */
     public function comments(){
-    	return $this->hasMany(PostComment::class, 'post_id', 'id');
+    	return $this->hasMany(PostComment::class, 'post_id', 'id')->with('user');
     }
 
     // this is a recommended way to declare event handlers

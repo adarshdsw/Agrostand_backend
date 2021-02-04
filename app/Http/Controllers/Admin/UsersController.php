@@ -17,14 +17,13 @@ class UsersController extends Controller
     {
         $data = [];
         $users = Users::all();
-        // $news = new Users();
-        // $data = $news->All();
-        if(count($users)){
+        /*if(count($users)){
             $data = ['status' => true, 'code' => 200, 'data'=>$users];
         }else{
             $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
         }
-        return $data;
+        return $data;*/
+        return view('admin.users.index', compact('users'));
     }
 
     /**
