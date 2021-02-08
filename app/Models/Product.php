@@ -40,4 +40,18 @@ class Product extends Model
     protected $dates = [
         'created_at', 'updated_at', 'deleted_at'
     ];
+
+    /**
+     * Get the offer for this product.
+    */
+    public function offer(){
+        return $this->hasOne(ProductOffer::class, 'product_id', 'id');
+    }
+
+    /**
+     * Get the offer for this product.
+    */
+    public function price(){
+        return $this->hasOne(ProductPrice::class, 'product_id', 'id');
+    }
 }

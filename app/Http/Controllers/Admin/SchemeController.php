@@ -14,12 +14,15 @@ class SchemeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $offset = $request->input('offset');
+        $limit  = $request->input('limit');
         $data = [];
-        $schmes = Scheme::all();
+        $schmes = Scheme::where('status', '1')->offset($offset)->limit($limit)->orderBy('id', 'DESC')->get();
+        $total_count = Scheme::where('status', '1')->count();
         if(count($schmes)){
-            $data = ['status' => true, 'code' => 200, 'data'=>$schmes];
+            $data = ['status' => true, 'code' => 200, 'data'=>$schmes, 'total_count'=>$total_count];
         }else{
             $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
         }

@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Yajra\Datatables\Datatables;
 use App\Models\Users;
 
 class UsersController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Displays datatables front end view
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function index()
     {
@@ -24,6 +25,16 @@ class UsersController extends Controller
         }
         return $data;*/
         return view('admin.users.index', compact('users'));
+    }
+    /**
+     * Process datatables ajax request.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function userData(Request $request){
+        // dd($request->all());
+        return Datatables::of(User::all())->make(true);
+        // dd($res);
     }
 
     /**

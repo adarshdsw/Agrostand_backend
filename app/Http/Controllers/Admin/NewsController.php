@@ -14,12 +14,15 @@ class NewsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $offset = $request->input('offset');
+        $limit  = $request->input('limit');
         $data = [];
-        $news = News::all();
+        $news = News::where('status', '1')->offset($offset)->limit($limit)->orderBy('id', 'DESC')->get();
+        $total_count = News::where('status', '1')->count();
         if(count($news)){
-            $data = ['status' => true, 'code' => 200, 'data'=>$news];
+            $data = ['status' => true, 'code' => 200, 'data'=>$news, 'total_count'=>$total_count];
         }else{
             $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
         }

@@ -158,4 +158,19 @@ return [
         'icon' => '',
         'url' => '/admin/users',
     ],
+    'datatables' => [
+        'name' => 'datatables',
+        'icon' => '',
+        'url' => '/admin/datatables',
+    ],
+    'units' => [
+        'name' => 'units',
+        'icon' => '',
+        'url' => '/admin/units',
+    ],
+    'pgroups' => [
+        'name' => 'pgroups',
+        'icon' => '',
+        'url' => '/admin/pgroups',
+    ],
 ];

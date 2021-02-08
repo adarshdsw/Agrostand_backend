@@ -25,6 +25,8 @@ Route::get('assured', 'UsersController@assuredList')->name('assured');
 
 Route::get('countries', 'UsersController@countryList')->name('countries');
 
+Route::get('units', 'UsersController@unitList')->name('units');
+
 Route::get('categories', 'UsersController@categoryList')->name('categories');
 
 Route::get('brands', 'UsersController@brandList')->name('brands');
@@ -36,6 +38,10 @@ Route::post('sub_categories', 'UsersController@subCategoryList')->name('sub_cate
 Route::post('commodities', 'UsersController@commodityList')->name('commodities');
 
 Route::post('states', 'UsersController@stateList')->name('states');
+
+Route::post('/districts', 'UsersController@districtList')->name('districts');
+
+Route::post('/cities', 'UsersController@cityList')->name('cities');
 
 Route::post('select_language', 'UsersController@selectLanguage')->name('select_language');
 
@@ -67,9 +73,9 @@ Route::post('login', 'UsersController@login');
 // banners list and Details
 Route::get('/banners', 'Admin\BannerController@index')->name('banners');
 // news list and Details
-Route::get('/news', 'Admin\NewsController@index')->name('news');
+Route::post('/news', 'Admin\NewsController@index')->name('news');
 // news list and Details
-Route::get('/schemes', 'Admin\SchemeController@index')->name('schemes');
+Route::post('/schemes', 'Admin\SchemeController@index')->name('schemes');
 // post master
 	Route::post('/posts', 'Api\PostController@index');
 	Route::post('/post/store', 'Api\PostController@store');
@@ -80,11 +86,17 @@ Route::get('/schemes', 'Admin\SchemeController@index')->name('schemes');
 	Route::post('/post/favorite', 'Api\PostController@favorite');
 	Route::post('/post/comment', 'Api\PostController@comment');
 	// user own posts
-	Route::get('/post/user/{id}', 'Api\PostController@userPosts')->name('user.own.posts');
+	Route::post('/post/user/', 'Api\PostController@userPosts')->name('user.own.posts');
 
 // product master
 	Route::post('/products', 'Api\ProductController@index');
 	Route::post('/product/store', 'Api\ProductController@store');
+	Route::get('/product/show/{id}', 'Api\ProductController@show');
+	Route::get('/product/group', 'Api\ProductController@productGroup');
+	// Buy lead store
+	Route::post('/buy/lead_store', 'Api\BuyController@store');
+	Route::post('/buy/product_list', 'Api\BuyController@index');
+	// Buy product list
 
 /* ----------------------- Admin Routes START -------------------------------- */
 

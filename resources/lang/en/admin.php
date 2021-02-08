@@ -39,6 +39,7 @@ return [
         'news-name' => 'News',
         'scheme-name' => 'Scheme',
         'brands-name' => 'Brand',
+        'datatables-name' => 'Datatable',
     ],
     'titles' => [
         'dashboard' => 'Dashboard',
@@ -127,6 +128,18 @@ return [
         'users' => 'User',
         'usersCreate' => 'User Creation',
         'usersEdit' => 'User Edit',
+
+        'datatables' => 'Datatable',
+        'datatablesCreate' => 'Datatable Creation',
+        'datatablesEdit' => 'Datatable Edit',
+
+        'units' => 'Units',
+        'unitsCreate' => 'Unit Creation',
+        'unitsEdit' => 'Unit Edit',
+
+        'pgroups' => 'Product Group',
+        'pgroupsCreate' => 'Product Creation',
+        'pgroupsEdit' => 'Product Edit',
     ],
     'menus' => [
         'dashboard' => 'Dashboard',

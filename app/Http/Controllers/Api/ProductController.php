@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 use App\Models\Product;
 use App\Models\ProductImage;
@@ -25,8 +26,11 @@ class ProductController extends Controller
         $user_id = $request->input('user_id');
 
         $products = Product::where('user_id', $user_id)->offset($offset)->limit($limit)->get();;
+
+        $total_count = Product::where('user_id' ,$user_id)->count();
+        
         if($products){
-            $data = ['status' => true, 'code' => 200, 'products' => $products];
+            $data = ['status' => true, 'code' => 200, 'products' => $products, 'total_count'=>$total_count];
         }else{
             $data = ['status' => false, 'code' => 500];
         }
@@ -60,12 +64,13 @@ class ProductController extends Controller
         $product->brand_id     = $request->input('brand_id');
         $product->title        = $request->input('title');
         $product->description  = $request->input('description');
+        $product->product_tags = ($request->input('product_tags')) ? $request->input('product_tags') : '';
         $product->product_url  = ($request->input('product_url')) ? $request->input('product_url') : '';
         $product->website_url  = ($request->input('website_url')) ? $request->input('website_url') : '';
         $product->package_size = ($request->input('package_size')) ? $request->input('package_size') : '';
-        $product->unit         = ($request->input('unit')) ? $request->input('unit') : '';
+        $product->package_unit = ($request->input('package_unit')) ? $request->input('package_unit') : '';
         $product->product_use  = ($request->input('product_use')) ? $request->input('product_use') : '';
-        $product->specification = ($request->input('specification')) ? $request->input('specification') : '';
+        // $product->specification = ($request->input('specification')) ? $request->input('specification') : '';
         $product->total_amount = ($request->input('total_amount')) ? $request->input('total_amount') : '0.00';
         // upload product file / video
         $file = $request->file('feature_img');
@@ -78,7 +83,7 @@ class ProductController extends Controller
             $product->feature_img   = '/uploads/products/'.$filenew;
         }
         // upload product document
-        $doc_file = $request->file('document');
+        /*$doc_file = $request->file('document');
         if($doc_file){
             $filename   = $doc_file->getClientOriginalName();
             $name       = "product_doc";
@@ -86,7 +91,7 @@ class ProductController extends Controller
             $filenew    =  date('d-M-Y').'_'.str_replace($filename,$name,$filename).'_'.time().''.rand(). "." .$extension;
             $doc_file->move(base_path('/public/uploads/products'), $filenew);
             $product->document   = '/uploads/products/'.$filenew;
-        }
+        }*/
         // $product->views = 0;
         $product->status = $request->input('status');
         $res = $product->save();
@@ -94,21 +99,25 @@ class ProductController extends Controller
             // product price
             $product_price = new ProductPrice();
             $product_price->product_id  = $product->id;
+            $product_price->approx_price = $request->input('approx_price');
             $product_price->min_qty     = $request->input('min_qty');
             $product_price->unit        = $request->input('unit');
-            $product_price->amount      = $request->input('amount');
             $product_price->last_update = date('Y-m-d');
             $res = $product_price->save();
+
+            if($request->input('is_offer')){
+                $product_offer = new ProductOffer();
+                $product_offer->product_id  = $product->id;
+                // $product_offer->offer_name  = $request->input('offer_name');
+                $product_offer->discount    = ($request->input('discount')) ? $request->input('discount') : 0;
+                $product_offer->amount      = ($request->input('offer_amount')) ? $request->input('offer_amount') : 0;
+                $product_offer->start_offer = $request->input('start_offer');
+                $product_offer->end_offer   = $request->input('end_offer');
+                $product_offer->offer_day   = ($request->input('offer_day')) ? $request->input('offer_day') : '';
+                $product_offer->offer_specification   = ($request->input('offer_specification')) ? $request->input('offer_specification') : '';
+                $res = $product_offer->save();
+            }
             // product offer
-            $product_offer = new ProductOffer();
-            $product_offer->product_id  = $product->id;
-            $product_offer->offer_name  = $request->input('offer_name');
-            $product_offer->discount    = $request->input('discount');
-            $product_offer->amount      = $request->input('offer_amount');
-            $product_offer->start_offer = $request->input('start_offer');
-            $product_offer->end_offer   = $request->input('end_offer');
-            $product_offer->offer_specification   = $request->input('offer_specification');
-            $res = $product_offer->save();
             return ['status' => true, 'code' => 200, 'data'=>$product];
         }else{
             return ['status' => false, 'code' => 500, 'message' => "something went wrong with database."];
@@ -123,7 +132,12 @@ class ProductController extends Controller
      */
     public function show($id)
     {
-        //
+        $product = Product::with(['price', 'offer'])->where('id', $id)->get();
+        if($product){
+            return ['status' => true, 'code' => 200, 'data'=>$product];
+        }else{
+            return ['status' => false, 'code' => 500, 'message' => "something went wrong with database."];
+        }
     }
 
     /**
@@ -158,5 +172,18 @@ class ProductController extends Controller
     public function destroy($id)
     {
         //
+    }
+    /**
+     * get all list of product group
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function productGroup(){
+        $product_groups = DB::table('product_groups')->get();
+        if($product_groups){
+            return ['status' => true, 'code' => 200, 'data'=>$product_groups];
+        }else{
+            return ['status' => false, 'code' => 404, 'message' => "data not found."];
+        }
     }
 }

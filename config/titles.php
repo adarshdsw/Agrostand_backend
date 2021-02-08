@@ -123,5 +123,20 @@ return [
             'create' => 'usersCreate',
             'edit' => 'usersEdit',
         ],
+        'datatables' => [
+            'index' => 'datatables',
+            'create' => 'datatablesCreate',
+            'edit' => 'datatablesEdit',
+        ],
+        'units' => [
+            'index' => 'units',
+            'create' => 'unitsCreate',
+            'edit' => 'unitsEdit',
+        ],
+        'pgroups' => [
+            'index' => 'pgroups',
+            'create' => 'pgroupsCreate',
+            'edit' => 'pgroupsEdit',
+        ],
     ]
 ];

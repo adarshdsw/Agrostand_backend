@@ -105,11 +105,16 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      *
     */
-    public function userPosts($user_id = null){
+    public function userPosts(Request $request){
+
+        $user_id = $request->input('user_id');
+        $offset  = $request->input('offset');
+        $limit   = $request->input('limit');
         if($user_id){
-            $post = Post::with('postImages', 'user', 'likes', 'comments')->where('user_id', $user_id)->get();
+            $post = Post::with('postImages', 'user', 'likes', 'comments')->where('status', '1')->where('user_id', $user_id)->offset($offset)->limit($limit)->orderBy('id', 'DESC')->get();
+            $total_count = Post::where('status', '1')->where('user_id', $user_id)->count();
             if($post){
-                $data = ['status' => true, 'code' => 200, 'data'=>$post];
+                $data = ['status' => true, 'code' => 200, 'data'=>$post, 'total_count'=>$total_count];
             }else{
                 $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
             }

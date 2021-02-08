@@ -49,8 +49,17 @@ class UsersController extends Controller
 		}
 	}
 
+	public function unitList(Request $request){
+		$units = DB::table('units')->get();
+		if($units){
+			$responseArr['status'] = true;
+			$responseArr['data'] = $units;
+			return response()->json($responseArr, Response::HTTP_OK);
+		}
+	}
+
 	public function countryList(Request $request){
-		$countries = DB::table('countries')->get();
+		$countries = DB::table('countries_new')->get();
 		if($countries){
 			$responseArr['status'] = true;
 			$responseArr['data'] = $countries;
@@ -97,12 +106,38 @@ class UsersController extends Controller
 	}
 
 	public function stateList(Request $request){
-		$country_id = $request->input('country_id');
-		$states = DB::table('states')->where('country_id', $country_id)->get();
+		// $country_id = $request->input('country_id');
+		$states = DB::table('state')->get();
 		if($states){
 			$responseArr['status'] = true;
 			$responseArr['data'] = $states;
 			return response()->json($responseArr, Response::HTTP_OK);
+		}
+	}
+
+	public function districtList(Request $request){
+		$state_id = $request->input('state_id');
+		$district = DB::table('district')->where('state_id', $state_id)->get();
+		if($district){
+			$responseArr['status'] = true;
+			$responseArr['data'] = $district;
+			return response()->json($responseArr, Response::HTTP_OK);
+		}else{
+			$responseArr['status'] = false;
+			return response()->json($responseArr, Response::HTTP_NOT_FOUND);
+		}
+	}
+
+	public function cityList(Request $request){
+		$district_id = $request->input('district_id');
+		$cities = DB::table('city')->where('district_id', $district_id)->get();
+		if($cities){
+			$responseArr['status'] = true;
+			$responseArr['data'] = $cities;
+			return response()->json($responseArr, Response::HTTP_OK);
+		}else{
+			$responseArr['status'] = false;
+			return response()->json($responseArr, Response::HTTP_NOT_FOUND);
 		}
 	}
 	/**

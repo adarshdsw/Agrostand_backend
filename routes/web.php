@@ -2,6 +2,8 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 Auth::routes([ 'verify' => true ]);
 
 Route::get('/', function () {
+
     return view('welcome');
 });
 
@@ -186,7 +189,18 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 		Route::resource('brands', 'BrandController');
 		// user master
 		Route::resource('users', 'UsersController');
-		
+		Route::get('users/data', 'UsersController@userData')->name('users.data');
+		// datatables
+		Route::get('datatables', 'DatatablesController@getIndex');
+		Route::get('datatables/data', 'DatatablesController@anyData')->name('datatables.data');
+		// Route::controller('datatables', 'DatatablesController', [
+		//     'anyData'  => 'datatables.data',
+		//     'getIndex' => 'datatables',
+		// ]);
+		// units master
+		Route::resource('units', 'UnitController');
+		// product group master
+		Route::resource('pgroups', 'ProductGroupController');
 	});
 });
 /* ----------------------- Admin Routes END -------------------------------- */
