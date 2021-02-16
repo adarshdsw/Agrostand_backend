@@ -138,5 +138,10 @@ return [
             'create' => 'pgroupsCreate',
             'edit' => 'pgroupsEdit',
         ],
+        'suggestions' => [
+            'index' => 'suggestions',
+            'create' => 'suggestionsCreate',
+            'edit' => 'suggestionsEdit',
+        ],
     ]
 ];

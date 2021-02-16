@@ -140,6 +140,10 @@ return [
         'pgroups' => 'Product Group',
         'pgroupsCreate' => 'Product Creation',
         'pgroupsEdit' => 'Product Edit',
+
+        'suggestions' => 'Suggestions',
+        'suggestionsCreate' => 'Suggestions Creation',
+        'suggestionsEdit' => 'Suggestions Edit',
     ],
     'menus' => [
         'dashboard' => 'Dashboard',

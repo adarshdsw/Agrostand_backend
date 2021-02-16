@@ -43,7 +43,7 @@
                 </div>
                 <div class="form-group">
                     <div class="custom-control custom-switch">
-                      <input type="checkbox" class="custom-control-input" id="status" name="status" value="1" {{ ($commodity->status == 1) ? "selected" : "" }}>
+                      <input type="checkbox" class="custom-control-input" id="status" name="status" value="1" {{ ($commodity->status == 1) ? "checked" : "" }}>
                       <label class="custom-control-label" for="status">status</label>
                     </div>
                 </div>

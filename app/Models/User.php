@@ -12,6 +12,10 @@ use App\Models\UserCommodity;
 use App\Models\UserBusiness;
 use App\Models\UserEducation;
 use App\Models\UserFollower;
+use App\Models\Category;
+use App\Models\Commodity;
+use App\Models\UserCity;
+use App\Models\Product;
 
 class User extends Authenticatable
 {
@@ -83,9 +87,34 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the education which belongs to this user.
+     * Get the has many followers this user.
     */
     public function followers(){
         return $this->hasMany(UserFollower::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the category belongs to this user.
+    */
+    public function category(){
+        return $this->belongsTo(Category::class, 'category_id', 'id');
+    }
+
+    /**
+     * Get the subcategory belongs to this user.
+    */
+    public function subcategory(){
+        return $this->belongsTo(Category::class, 'subcategory_id', 'id');
+    }
+
+    /**
+     * Get the commodity belongs to this user.
+    */
+    public function commodity(){
+        return $this->belongsTo(Commodity::class, 'commodity_id', 'id');
+    }
+
+    public function products(){
+        return $this->hasMany(Product::class, 'user_id', 'id')->with(['price']);
     }
 }

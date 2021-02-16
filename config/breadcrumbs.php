@@ -173,4 +173,9 @@ return [
         'icon' => '',
         'url' => '/admin/pgroups',
     ],
+    'suggestions' => [
+        'name' => 'suggestions',
+        'icon' => '',
+        'url' => '/admin/suggestions',
+    ],
 ];

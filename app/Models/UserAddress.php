@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\UserCity;
 
 class UserAddress extends Model
 {
@@ -36,4 +37,9 @@ class UserAddress extends Model
     protected $dates = [
         'created_at', 'updated_at'
     ];
+    
+    public function city(){
+        echo "test address city";
+        // return $this->belongsTo(UserCity::class, 'city', 'city_id');
+    }
 }

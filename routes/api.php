@@ -96,7 +96,19 @@ Route::post('/schemes', 'Admin\SchemeController@index')->name('schemes');
 	// Buy lead store
 	Route::post('/buy/lead_store', 'Api\BuyController@store');
 	Route::post('/buy/product_list', 'Api\BuyController@index');
+	Route::post('/buy/lead_list', 'Api\BuyController@leadList');
 	// Buy product list
+	// Product Suggestions
+	Route::post('/product/suggestions', 'Admin\SuggestionController@suggestionList');
+	// Sell lead store
+	Route::post('/sell/lead_store', 'Api\SellController@store');
+	Route::post('/sell/vendor_list', 'Api\SellController@index');
+	Route::post('/sell/request', 'Api\SellController@sellRequestVendor');
+	Route::post('/sell/lead_list', 'Api\SellController@leadList');
+	Route::post('/sell/request_list', 'Api\SellController@sellRequestList');
+	Route::post('/sell/request_detail', 'Api\SellController@sellRequestDetail');
+	// agronomist lead store
+	Route::post('/agronomist/lead_store', 'Api\AgronomistController@store');
 
 /* ----------------------- Admin Routes START -------------------------------- */
 

@@ -184,6 +184,8 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 		// users list
 		Route::get('users', 'UsersController@index');
 		Route::post('/user/update_status', 'UsersController@updateStatus');
+		Route::get('user/update_assure', 'UsersController@updateAssure')->name('user.assure');
+		Route::get('user/update_verify', 'UsersController@updateVerify')->name('user.verify');
 		
 		// brand master
 		Route::resource('brands', 'BrandController');
@@ -201,6 +203,8 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 		Route::resource('units', 'UnitController');
 		// product group master
 		Route::resource('pgroups', 'ProductGroupController');
+		// suggestion
+		Route::resource('suggestions', 'SuggestionController');
 	});
 });
 /* ----------------------- Admin Routes END -------------------------------- */

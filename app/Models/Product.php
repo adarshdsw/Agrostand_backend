@@ -8,6 +8,8 @@ use App\Models\ProductImage;
 use App\Models\ProductOffer;
 use App\Models\ProductPrice;
 use App\Models\ProductRatting;
+use App\Models\User;
+use App\Models\Category;
 
 class Product extends Model
 {
@@ -53,5 +55,23 @@ class Product extends Model
     */
     public function price(){
         return $this->hasOne(ProductPrice::class, 'product_id', 'id');
+    }
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'id');
     }
 }

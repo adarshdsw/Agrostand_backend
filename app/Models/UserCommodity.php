@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Commodity;
 
 class UserCommodity extends Model
 {
@@ -35,4 +36,10 @@ class UserCommodity extends Model
     protected $dates = [
         'created_at', 'updated_at'
     ];
+    /**
+     * Get the address which belongs to this user.
+    */
+    public function commodity(){
+        return $this->belongsTo(Commodity::class, 'commodity_id', 'id');
+    }    
 }

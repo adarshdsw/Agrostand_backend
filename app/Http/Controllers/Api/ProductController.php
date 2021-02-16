@@ -25,7 +25,7 @@ class ProductController extends Controller
         $limit   = $request->input('limit');
         $user_id = $request->input('user_id');
 
-        $products = Product::where('user_id', $user_id)->offset($offset)->limit($limit)->get();;
+        $products = Product::where('user_id', $user_id)->offset($offset)->limit($limit)->orderBy('id', 'DESC')->get();;
 
         $total_count = Product::where('user_id' ,$user_id)->count();
         
@@ -70,8 +70,11 @@ class ProductController extends Controller
         $product->package_size = ($request->input('package_size')) ? $request->input('package_size') : '';
         $product->package_unit = ($request->input('package_unit')) ? $request->input('package_unit') : '';
         $product->product_use  = ($request->input('product_use')) ? $request->input('product_use') : '';
-        // $product->specification = ($request->input('specification')) ? $request->input('specification') : '';
-        $product->total_amount = ($request->input('total_amount')) ? $request->input('total_amount') : '0.00';
+        $product->specification = ($request->input('specification')) ? $request->input('specification') : '';
+        $product->total_amount  = ($request->input('total_amount')) ? $request->input('total_amount') : '0.00';
+        $product->state_id      = ($request->input('state_id')) ? $request->input('state_id') : '0';
+        $product->district_id   = ($request->input('district_id')) ? $request->input('district_id') : '0';
+        $product->city_id       = ($request->input('city_id')) ? $request->input('city_id') : '0';
         // upload product file / video
         $file = $request->file('feature_img');
         if($file){
@@ -105,7 +108,7 @@ class ProductController extends Controller
             $product_price->last_update = date('Y-m-d');
             $res = $product_price->save();
 
-            if($request->input('is_offer')){
+            if($request->input('is_offer') == 'true'){
                 $product_offer = new ProductOffer();
                 $product_offer->product_id  = $product->id;
                 // $product_offer->offer_name  = $request->input('offer_name');

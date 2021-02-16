@@ -101,6 +101,15 @@
             </li>
 
             <li class="nav-item menu-open">
+               <a href="{{ route('admin.suggestions.index') }}" class="nav-link {{ ($title == 'Suggestions') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Suggestions
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
                <a href="javascript:;" class="nav-link" onclick="event.preventDefault(); document.querySelector('#admin-logout-form').submit();">
                   <i class="nav-icon fa fa-sign-out-alt"></i>
                   <p>
