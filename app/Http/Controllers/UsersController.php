@@ -13,6 +13,7 @@ use App\Models\UserCommodity;
 use App\Models\UserBusiness;
 use App\Models\UserEducation;
 use App\Models\UserFollower;
+use App\Models\Ebill;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,82 @@ use Illuminate\Support\Facades\Validator;
 
 class UsersController extends Controller
 {
+	public function index(Request $request){
+		$perameters     = $request->all();
+        $user_id    	= $request->input('user_id');
+        $category_id    = $request->input('category_id');
+        $subcategory_id = $request->input('subcategory_id');
+        $commodity_id   = $request->input('commodity_id');
+        $role_id        = $request->input('role_id');
+        $offset         = $request->input('offset');
+        $limit          = $request->input('limit');
+        $column_name    = $request->input('column_name');
+        $sort_by        = $request->input('sort_by');
+
+        $users = User::with('category', 'subcategory', 'commodity', 'address')
+                        ->where('id', '!=', $user_id)->where('status', '1')->where('role_id', $role_id)
+                        ->when ((isset($category_id) && $category_id !== '' && !empty($category_id) ), function ($query) use ($perameters) {
+                            $query->where('category_id', $perameters['category_id']);
+                        })
+                        ->when ((isset($subcategory_id) && $subcategory_id !== '' && !empty($subcategory_id) ), function ($query) use ($perameters) {
+                            $query->where('subcategory_id', $perameters['subcategory_id']);
+                        })
+                        ->when ((isset($commodity_id) && $commodity_id !== '' && !empty($commodity_id) ), function ($query) use ($perameters) {
+                            $query->where('commodity_id', $perameters['commodity_id']);
+                        })
+                        ->when ((isset($perameters['state_id']) && $perameters['state_id'] !== '' && !empty($perameters['state_id']) ), function ($query) use ($perameters) {
+                            $query->where('state_id', $perameters['state_id']);
+                        })
+                        ->when ((isset($perameters['district_id']) && $perameters['district_id'] !== '' && !empty($perameters['district_id']) ), function ($query) use ($perameters) {
+                            $query->where('district_id', $perameters['district_id']);
+                        })
+                        ->when ((isset($perameters['city_id']) && $perameters['city_id'] !== '' && !empty($perameters['city_id']) ), function ($query) use ($perameters) {
+                            $query->where('city_id', $perameters['city_id']);
+                        })
+                        ->when ((isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ), function ($query) use ($perameters) {
+                            $query->where('assured_id', $perameters['assured_id']);
+                        })
+                        ->offset($offset)
+                        ->limit($limit)
+                        ->orderBy($column_name, $sort_by)
+                        ->get();
+                        
+        $total_count = User::where('id', '!=', $user_id)->where('status', '1')->where('role_id', $role_id)
+                        ->when ((isset($category_id) && $category_id !== '' && !empty($category_id) ), function ($query) use ($perameters) {
+                            $query->where('category_id', $perameters['category_id']);
+                        })
+                        ->when ((isset($subcategory_id) && $subcategory_id !== '' && !empty($subcategory_id) ), function ($query) use ($perameters) {
+                            $query->where('subcategory_id', $perameters['subcategory_id']);
+                        })
+                        ->when ((isset($commodity_id) && $commodity_id !== '' && !empty($commodity_id) ), function ($query) use ($perameters) {
+                            $query->where('commodity_id', $perameters['commodity_id']);
+                        })
+                        ->when ((isset($perameters['state_id']) && $perameters['state_id'] !== '' && !empty($perameters['state_id']) ), function ($query) use ($perameters) {
+                            $query->where('state_id', $perameters['state_id']);
+                        })
+                        ->when ((isset($perameters['district_id']) && $perameters['district_id'] !== '' && !empty($perameters['district_id']) ), function ($query) use ($perameters) {
+                            $query->where('district_id', $perameters['district_id']);
+                        })
+                        ->when ((isset($perameters['city_id']) && $perameters['city_id'] !== '' && !empty($perameters['city_id']) ), function ($query) use ($perameters) {
+                            $query->where('city_id', $perameters['city_id']);
+                        })
+                        ->when ((isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ), function ($query) use ($perameters) {
+                            $query->where('assured_id', $perameters['assured_id']);
+                        })
+                        ->count();
+        if($users){
+        	$ebill_last = Ebill::latest()->first();
+        	$next_ebill_id = $ebill_last->id + 1;
+        	$order_id = 'AS'.date("Ymd").'-'.rand(10000, 99999).'-'.$next_ebill_id;
+        	$bill_number = time();
+        	// echo $ebill_last->id + 1;die;
+            $data = ['status' => true, 'code' => 200, 'users' => $users, 'total_count'=>$total_count, 'order_id'=>$order_id, 'bill_number'=>$bill_number];
+        }else{
+            $data = ['status' => false, 'code' => 500];
+        }
+        return $data;
+	}
+
 	public function languageList(Request $request){
 		$languages = DB::table('languages')->get();
 		if($languages){

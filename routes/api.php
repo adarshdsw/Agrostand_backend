@@ -109,6 +109,25 @@ Route::post('/schemes', 'Admin\SchemeController@index')->name('schemes');
 	Route::post('/sell/request_detail', 'Api\SellController@sellRequestDetail');
 	// agronomist lead store
 	Route::post('/agronomist/lead_store', 'Api\AgronomistController@store');
+	Route::post('/agronomist/lead/list', 'Api\AgronomistController@index');
+	Route::post('/agronomist/service/store', 'Api\AgronomistController@serviceStore');
+	Route::post('/agronomist/service/list', 'Api\AgronomistController@serviceList');
+	Route::get('/agronomist/service/show/{id}', 'Api\AgronomistController@showService');
+
+	// E-bill
+	Route::post('/ebill/vendor/list', 'UsersController@index');
+	Route::post('/ebill/create', 'Api\EbillController@store');
+	Route::post('/ebill/product/add', 'Api\EbillController@addProduct');
+	Route::get('/ebill/product/delete/{id}', 'Api\EbillController@deleteProduct');
+	Route::post('/ebill/list', 'Api\EbillController@index');
+	Route::get('/ebill/show/{id}', 'Api\EbillController@show');
+	Route::post('/ebill/rfp_status/update', 'Api\EbillController@rfpStatusUpdate');
+	Route::post('/ebill/shipping/store', 'Api\EbillController@shippingStore');
+	Route::post('/ebill/verify/driver_otp', 'Api\EbillController@verifyDriverOtp');
+	Route::post('/ebill/resend/driver_otp', 'Api\EbillController@resendDriverOtp');
+	Route::post('/ebill/business/transaction', 'Api\EbillController@ebillTransaction');
+	Route::post('/ebill/payment_status/update', 'Api\EbillController@paymentStatusUpdate');
+
 
 /* ----------------------- Admin Routes START -------------------------------- */
 
