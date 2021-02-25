@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Category;
 use App\Models\EbillProducts;
 use App\Models\EbillExpenses;
+use App\Models\DriverTracking;
 
 class Ebill extends Model
 {
@@ -69,5 +70,15 @@ class Ebill extends Model
 
     public function products(){
     	return $this->belongsToMany(EbillProducts::class, 'ebill_belongs_many_products', 'ebill_id', 'ebill_product_id');
+    }
+
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function driver()
+    {
+        return $this->hasOne(DriverTracking::class, 'ebill_id', 'id');
     }
 }

@@ -127,6 +127,10 @@ Route::post('/schemes', 'Admin\SchemeController@index')->name('schemes');
 	Route::post('/ebill/resend/driver_otp', 'Api\EbillController@resendDriverOtp');
 	Route::post('/ebill/business/transaction', 'Api\EbillController@ebillTransaction');
 	Route::post('/ebill/payment_status/update', 'Api\EbillController@paymentStatusUpdate');
+	// delivery
+	Route::post('/ebill/send/delivery_otp', 'Api\EbillController@sendDeliveryOtp');
+	Route::post('/ebill/resend/delivery_otp', 'Api\EbillController@resendDeliveryOtp');
+	Route::post('/ebill/verify/driver_delivery_otp', 'Api\EbillController@verifyDriverDeliveryOtp');
 
 
 /* ----------------------- Admin Routes START -------------------------------- */

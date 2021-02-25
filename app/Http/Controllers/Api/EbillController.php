@@ -10,6 +10,7 @@ use App\Models\EbillBelongsManyProducts;
 use App\Models\EbillShipping;
 use App\Models\EbillTransaction;
 use App\Models\Driver;
+use App\Models\DriverTracking;
 use Illuminate\Http\Request;
 
 class EbillController extends Controller
@@ -43,7 +44,7 @@ class EbillController extends Controller
             $total_count = Ebill::where('user_id', $user_id)->count();
         }else{
             // get list of vendor ebills
-            $ebills = Ebill::with(['vendor'])
+            $ebills = Ebill::with(['user'])
             ->where('vendor_id', $vendor_id)
             ->offset($offset)
             ->limit($limit)
@@ -144,7 +145,8 @@ class EbillController extends Controller
         // $order_id = 'AS'.date("Ymd").'-'.rand(10000, 99999);
         // $bill_number = time();
         $ebill_shipping = new EbillShipping();
-        $ebill_shipping->ebill_id           = ($perameters['ebill_id']) ? $perameters['ebill_id'] : 0;
+        $ebill_id           = ($perameters['ebill_id']) ? $perameters['ebill_id'] : 0;
+        $ebill_shipping->ebill_id  = $ebill_id;
         $shipping_type      = ($perameters['shipping_type']) ? $perameters['shipping_type'] : '1';
         $ebill_shipping->shipping_type      = $shipping_type;
         if($shipping_type == '1'){
@@ -217,13 +219,25 @@ class EbillController extends Controller
             }
             $ebill_shipping->lt_driver_otp          = '123456';
 
-            $driver = new Driver();
+            /*$driver = new Driver();
             $driver->name = ($perameters['lt_driver_name']) ? $perameters['lt_driver_name'] : '';
             $driver->mobile = ($perameters['lt_driver_mobile']) ? $perameters['lt_driver_mobile'] : '';
             $driver->profile_image = $driver_img;
             $driver->driver_otp = '123456';
             $driver->status = 1;
-            $driver->save();
+            $driver->save();*/
+            $driver_data = [];
+            $driver_data['name'] = ($perameters['lt_driver_name']) ? $perameters['lt_driver_name'] : '';
+            $driver_data['mobile'] = ($perameters['lt_driver_mobile']) ? $perameters['lt_driver_mobile'] : '';
+            $driver_data['profile_image'] = $driver_img;
+            $driver_data['driver_otp'] = '123456';
+            $driver_data['status'] = 1;
+            $driver = Driver::updateOrCreate(['mobile' => $driver_data['mobile']],$driver_data);
+            $driver_tracking = new DriverTracking();
+            $driver_tracking->ebill_id = $ebill_id;
+            $driver_tracking->driver_id = $driver->id;
+            $driver_tracking->status = 1;
+            $driver_tracking->save();
         }
         // echo "<pre>";print_r($ebill_shipping);die;
         $res = $ebill_shipping->save();
@@ -301,7 +315,7 @@ class EbillController extends Controller
      */
     public function show($id)
     {
-        $ebill = Ebill::with(['user', 'vendor', 'products', 'expenses'])->where('id', $id)->first();
+        $ebill = Ebill::with(['user', 'vendor', 'products', 'expenses', 'driver'])->where('id', $id)->first();
         if($ebill){
             return ['status' => true, 'code' => 200, 'data'=>$ebill];
         }else{
@@ -454,4 +468,76 @@ class EbillController extends Controller
             return ['status' => false, 'code' => 404, 'message' => "data not found."];
         }
     }
+
+    // delivery part
+    /* send delivery otp  */
+    public function sendDeliveryOtp(Request $request){
+        $ebill_id   = $request->input('ebill_id');
+        $driver_id  = $request->input('driver_id');
+        $driver_tracking = DriverTracking::where('ebill_id', $ebill_id)->where('driver_id', $driver_id)->first();
+        if($driver_tracking){
+            $driver_tracking->delivery_otp = '123456';
+            $res = $driver_tracking->save();
+            if($res){
+                return ['status' => true, 'code' => 200, 'data'=>$driver_tracking];
+            }else{
+                return ['status' => false, 'code' => 500, 'message' => "something went wrong with database."];
+            }
+        }else{
+            return ['status' => false, 'code' => 404, 'message' => "data not found."];   
+        }
+    }
+    /* resend delivery otp  */
+    public function resendDeliveryOtp(Request $request){
+        $ebill_id   = $request->input('ebill_id');
+        $driver_id  = $request->input('driver_id');
+        $driver_tracking = DriverTracking::where('ebill_id', $ebill_id)->where('driver_id', $driver_id)->first();
+        if($driver_tracking){
+            $driver_tracking->delivery_otp = '123456';
+            $res = $driver_tracking->save();
+            if($res){
+                return ['status' => true, 'code' => 200, 'data'=>$driver_tracking];
+            }else{
+                return ['status' => false, 'code' => 500, 'message' => "something went wrong with database."];
+            }
+        }else{
+            return ['status' => false, 'code' => 404, 'message' => "data not found."];   
+        }
+    }
+        /**
+     * Driver OTP verify
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     *
+     */
+    public function verifyDriverDeliveryOtp(Request $request){
+        $ebill_id   = $request->input('ebill_id');
+        $driver_id  = $request->input('driver_id');
+        $driver_delivery_otp  = $request->input('driver_delivery_otp');
+        $last_updated_location  = $request->input('last_updated_location');
+        $driver_tracking = DriverTracking::where('ebill_id', $ebill_id)->where('driver_id', $driver_id)->first();
+        if($driver_tracking){
+            if($driver_tracking->delivery_otp == $driver_delivery_otp){
+                // set driver otp null
+                $driver_tracking->delivery_otp = '';
+                $driver_tracking->last_updated_location = $last_updated_location;
+                $driver_tracking->is_delivered = 1;
+                $driver_tracking->status = 0;
+                $res    = $driver_tracking->save();
+                // get ebill which belongs to ebill shipping
+                $ebill  = $driver_tracking->ebill()->first();
+                $ebill->is_delivered = 1;
+                $res    = $ebill->save();
+
+                $data = ['status' => true, 'code' => 200, 'msg'=>'otp verified successfully'];
+            }else{
+                $data = ['status' => false, 'code' => 403, 'msg'=>'otp not verified'];
+            }
+        }else{
+            $data = ['status' => false, 'code' => 404, 'msg'=>'data not found'];
+        }
+        return $data;
+    }
+
 }

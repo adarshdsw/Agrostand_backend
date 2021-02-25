@@ -16,8 +16,9 @@ class NewsController extends Controller
      */
     public function index(Request $request)
     {
-        $offset = $request->input('offset');
-        $limit  = $request->input('limit');
+        // dd($request->all());
+        $offset = 0;
+        $limit  = 10;
         $data = [];
         $news = News::where('status', '1')->offset($offset)->limit($limit)->orderBy('id', 'DESC')->get();
         $total_count = News::where('status', '1')->count();

@@ -16,8 +16,8 @@ class SchemeController extends Controller
      */
     public function index(Request $request)
     {
-        $offset = $request->input('offset');
-        $limit  = $request->input('limit');
+        $offset = 0;
+        $limit  = 10;
         $data = [];
         $schmes = Scheme::where('status', '1')->offset($offset)->limit($limit)->orderBy('id', 'DESC')->get();
         $total_count = Scheme::where('status', '1')->count();
