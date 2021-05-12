@@ -19,7 +19,7 @@ class EbillTransaction extends Model
      * @var array
      */
     protected $fillable = [
-        'ebill_id','sender_id','receiver_id','transaction_amount', 'status'
+        'ebill_id','sender_id','receiver_id','transaction_amount', 'transaction_receipt', 'status'
     ];
 
     /**
@@ -45,5 +45,24 @@ class EbillTransaction extends Model
     public function ebill()
     {
         return $this->belongsTo(Ebill::class, 'ebill_id', 'id');
+    }
+
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id', 'id');
+    }
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function receiver()
+    {
+        return $this->belongsTo(User::class, 'receiver_id', 'id');
     }
 }

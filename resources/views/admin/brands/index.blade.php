@@ -19,6 +19,7 @@
                            <tr>
                               <th style="width: 10px">#</th>
                               <th>Image</th>
+                              <th>Category</th>
                               <th>Title</th>
                               <th>Title Hindi</th>
                               <th>Slug</th>
@@ -34,7 +35,12 @@
                               @foreach($brands as $brand)
                                  <tr>
                                     <td>{{ $counter }}</td>
-                                    <td><img src="{{ $brand->icon }}" alt="{{ $brand->title }}" width="75" height="75"></td>
+                                    <td>
+                                       <a href="{{ $brand->icon }}" data-toggle="lightbox">
+                                          <img src="{{ $brand->icon }}" alt="{{ $brand->title }}" width="75" height="75">
+                                       </a>
+                                    </td>
+                                    <td>{{ ($brand->category) ? $brand->category->title : '' }}</td>
                                     <td>{{ $brand->title }}</td>
                                     <td>{{ $brand->title_hindi }}</td>
                                     <td>{{ $brand->slug }}</td>
@@ -97,14 +103,14 @@
             event.preventDefault();
             var that  = $(this);
             var url   = that.attr('href');
-            var title = "Commodity Edit";
+            var title = "Brand Edit";
             sbm.loadMultiPartForm(url, $(this), errorAjax, title);
          })
          .on('click', 'td a.ajax-view', function (event) {
             event.preventDefault();
             var that  = $(this);
             var url   = that.attr('href');
-            var title = "Commodity View";
+            var title = "Brand View";
             sbm.loadMultiPartForm(title, event, $(this), url)
          })
          .on('click', 'td a.ajax-delete', function (event) {

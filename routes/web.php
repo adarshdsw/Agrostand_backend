@@ -3,7 +3,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 
-
+use Illuminate\Support\Facades\Mail;
+use App\Notifications\AccountActivated;
+use App\Notifications\UserWelcome;
+use App\Notifications\UserLikePost;
+use App\Models\User;
+use App\Models\Ebill;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -42,6 +47,89 @@ Route::get('/login', function(){
 
 Route::prefix('authentication')->group(function () {
     Route::post('login', 'UsersController@create');
+});
+
+
+Route::get('fcm-notification', function(){
+	$user = User::find(5);
+	// dd($user);
+	$response = $user->notify(new AccountActivated);
+	dd($response);
+});
+
+
+Route::get('user-welcome', function(){
+	$fromUser = User::find(2);
+    $toUser = User::find(5);
+
+	$res = Notification::send($toUser, new UserWelcome($fromUser));
+	dd($res);
+});
+
+Route::get('post-like', function(){
+    $toUser = User::find(19);
+    // dd($toUser);
+	$res = Notification::send($toUser, new UserLikePost());
+	dd($res);
+});
+
+/*Route::get('ebill-pdf_preview', function(){
+	// dd(public_path());
+    $ebill = Ebill::find(11);
+    if(!empty($ebill)){
+    	// $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('layouts.ebill_pdf_preview_2', compact('ebill'));
+    	$path = public_path('/img/logo.png');
+		$type = pathinfo($path, PATHINFO_EXTENSION);
+		$data = file_get_contents($path);
+		$custom_data['logo_base64'] = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    	
+    	$path = public_path('/img/dimension.png');
+		$type = pathinfo($path, PATHINFO_EXTENSION);
+		$data = file_get_contents($path);
+		$custom_data['dimention_base64'] = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+    	$pdf 	 =  PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('layouts.ebill_pdf_preview_2', compact('ebill', 'custom_data'));
+        $path 	 =  base_path('public/uploads/ebill_pdf');
+        $file    =  date('d-M-Y').'_'.'ebill'.'_'.time().''.rand(). ".pdf";
+        $filenew =  $path.'/'.$file;
+        $ebill->ebill_pdf = asset('/uploads/ebill_pdf/'.$file);
+        $ebill->save();
+        // dd($filenew);
+        // $pdf_res  = $pdf->setPaper('a4', 'landscape')->setWarnings(false)->save($filenew);
+        return view('layouts.ebill_pdf_preview_2', compact('ebill', 'custom_data'));
+    }else{
+        return redirect(route('admin.ebills.index'))->with('fail', 'Ebill Not found');
+    }
+});*/
+
+Route::get('ebill-pdf_preview', function(){
+	// dd(public_path());
+    $ebill = Ebill::find(1);
+    if(!empty($ebill)){
+    	// $pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('layouts.ebill_pdf_preview_2', compact('ebill'));
+    	$path = public_path('/img/logo.png');
+		$type = pathinfo($path, PATHINFO_EXTENSION);
+		$data = file_get_contents($path);
+		$custom_data['logo_base64'] = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    	
+    	$path = public_path('/img/banner.jpg');
+		$type = pathinfo($path, PATHINFO_EXTENSION);
+		$data = file_get_contents($path);
+		$custom_data['banner_base64'] = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+    	$pdf 	 =  PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => false])->loadView('layouts.ebill_pdf_preview_3', compact('ebill', 'custom_data'));
+        $path 	 =  base_path('public/uploads/ebill_pdf');
+        $file    =  date('d-M-Y').'_'.'ebill'.'_'.time().''.rand(). ".pdf";
+        $filenew =  $path.'/'.$file;
+        /*$ebill->ebill_pdf = asset('/uploads/ebill_pdf/'.$file);
+        $ebill->save();*/
+        // dd($filenew);
+        $pdf->getDomPdf()->getOptions()->set('enable_php', true);
+        $pdf_res  = $pdf->setPaper('a4', 'portrait')->setWarnings(false)->save($filenew);
+        return view('layouts.ebill_pdf_preview_3', compact('ebill', 'custom_data'));
+    }else{
+        return redirect(route('admin.ebills.index'))->with('fail', 'Ebill Not found');
+    }
 });
 
 /*
@@ -111,6 +199,7 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 
 		// My Commodity Master
 		Route::get('/commodity', 'CommodityController@commodityList')->name('commodity.index');
+		Route::post('/commodity-data', 'CommodityController@commodityData')->name('commodity.data');
 		// show commodity form to create
 		Route::get('/commodity/create', 'CommodityController@create')->name('commodity.create');
 		// store commodity form to db
@@ -153,6 +242,7 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 		Route::delete('/news/{id}', 'NewsController@destroy');
 		// My News Master
 		Route::get('/news', 'NewsController@newsList')->name('news.index');
+		Route::post('news-data', 'NewsController@newsData')->name('news-data');
 		// show banner form to create
 		Route::get('/news/create', 'NewsController@create')->name('news.create');
 		// store news form to db
@@ -174,6 +264,8 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 		Route::delete('/scheme/{id}', 'SchemeController@destroy');
 		// My Schemes Master
 		Route::get('/scheme', 'SchemeController@schemeList')->name('scheme.index');
+		// post datatable
+		Route::post('scheme-data', 'SchemeController@schemeData')->name('scheme-data');
 		// show banner form to create
 		Route::get('/scheme/create', 'SchemeController@create')->name('scheme.create');
 		// store scheme form to db
@@ -186,17 +278,19 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 		Route::put('/scheme/update/{scheme}', 'SchemeController@updateScheme')->name('scheme.update');
 		// delete my scheme
 		Route::delete('/scheme/{scheme}', 'SchemeController@deleteScheme')->name('scheme.delete');
-		// users list
-		Route::get('users', 'UsersController@index');
+
 		Route::post('/user/update_status', 'UsersController@updateStatus');
 		Route::get('user/update_assure', 'UsersController@updateAssure')->name('user.assure');
 		Route::get('user/update_verify', 'UsersController@updateVerify')->name('user.verify');
+		Route::get('user/update_status_new', 'UsersController@updateStatusNew')->name('user.status_update_new');
 		
 		// brand master
 		Route::resource('brands', 'BrandController');
 		// user master
 		Route::resource('users', 'UsersController');
-		Route::get('users/data', 'UsersController@userData')->name('users.data');
+		// user datatable
+		Route::post('users-data', 'UsersController@userData')->name('users-data');
+		// Route::get('users/data', 'UsersController@userData')->name('users.data');
 		// datatables
 		Route::get('datatables', 'DatatablesController@getIndex');
 		Route::get('datatables/data', 'DatatablesController@anyData')->name('datatables.data');
@@ -210,6 +304,58 @@ Route::prefix('admin')->name('admin.')->namespace('Admin')->group(function(){
 		Route::resource('pgroups', 'ProductGroupController');
 		// suggestion
 		Route::resource('suggestions', 'SuggestionController');
+		// drivers
+		Route::resource('drivers', 'DriverController');
+		Route::post('drivers-data', 'DriverController@driverData')->name('driver.data');
+		// ebills
+		Route::resource('ebills', 'EbillController');
+		// Ebills-data
+		Route::post('/ebills-data', 'EbillController@EbillsData')->name('ebills.data');
+		// villages
+		Route::resource('villages', 'VillageController');
+		// agromeets
+		Route::resource('agromeets', 'AgromeetController');
+		// get state districts
+		Route::get('/state/districts/', 'VillageController@getStateDistricts')->name('state.districts');
+		Route::get('/district/cities/', 'VillageController@getDistrictCities')->name('district.cities');
+		
+		Route::get('ebill_shipping', 'EbillController@shipping_index')->name('ebill.shipping.index');
+		Route::post('ebill_shipping-data', 'EbillController@ebillShippingData')->name('ebill.shipping.data');
+		Route::get('/shippings/driver/create/{ebill_shipping}', 'EbillController@addDriver')->name('shipping.driver.add');
+		Route::post('/shippings/driver/store', 'EbillController@driverShippingStore')->name('shipping.driver.store');
+		
+		Route::get('ebill/shipping/accept/{ebill_shipping_id}', 'EbillController@shippingAccept')->name('ebill.shipping.accept');
+		Route::post('ebill/shipping/accept/save', 'EbillController@shippingAcceptSave')->name('ebill.shipping.accept_save');
+
+		Route::get('ebill/shipping/decline/{ebill_shipping_id}', 'EbillController@shippingDecline')->name('ebill.shipping.decline');
+		Route::post('ebill/shipping/decline/save', 'EbillController@shippingDeclineSave')->name('ebill.shipping.decline_save');
+		// Ebill Driver Tracking
+		Route::get('driver_tracking', 'DriverController@driverTrackingList')->name('driver.tracking.index');
+		// show driver Complete shipping
+		Route::get('/driver/shippings/create', 'DriverController@driverShippingCreate')->name('driver.shipping.create');
+		Route::get('/driver/shippings/{driver}', 'DriverController@driverShippingList')->name('driver_shipping.show');
+		Route::post('/driver/shippings/store', 'DriverController@driverShippingStore')->name('driver.shipping.store');
+		// Payment Holded by admin list
+		Route::get('hold_payment', 'EbillController@ebillHoldingPayment')->name('ebill.holding.payment');
+		Route::post('pay_holding-data', 'EbillController@payHoldingData')->name('ebill.holding.payment.data');
+		
+		Route::post('ebill/holding_payment/accept/{ebill_id}', 'EbillController@holdingPaymentAccept')->name('ebill.holding_payment.accept');
+		Route::post('ebill/holding_payment/decline/{ebill_id}', 'EbillController@holdingPaymentDecline')->name('ebill.holding_payment.decline');
+		Route::post('ebill/holding_payment/processed/{ebill_id}', 'EbillController@holdingPaymentProcessed')->name('ebill.holding_payment.processed');
+		// Ebill Shipping Assignment to Driver
+		Route::resource('driver_assignments', 'DriverAssignmentController');
+		Route::post('driver_shipping-data', 'DriverAssignmentController@ebillShippingData')->name('ebill.shipping.data');
+		Route::post('driver_shipping-store', 'DriverAssignmentController@store')->name('driver_shipping-store');
+		Route::delete('driver_shipping-delete', 'DriverAssignmentController@delete')->name('drivers.delete_ebill');
+
+		Route::get('settings', 'SettingController@index')->name('settings');
+		Route::put('settings/update/{setting}', 'SettingController@update')->name('settings.update');
+
+		Route::get('bank', 'AdminBankController@index')->name('bank');
+		Route::put('bank/update/{admin_bank}', 'AdminBankController@update')->name('bank.update');
+
+		Route::get('/profile', 'AdminController@edit')->name('profile');
+		Route::put('profile/update/{admin}', 'AdminController@update')->name('profile.update');
 	});
 });
 /* ----------------------- Admin Routes END -------------------------------- */

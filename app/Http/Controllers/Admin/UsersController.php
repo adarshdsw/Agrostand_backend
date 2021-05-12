@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;;
-use Yajra\Datatables\Datatables;
-use App\Models\Users;
 use App\Models\User;
+use App\Models\Category;
+use App\Models\Role;
+use App\Models\Assured;
+// Datatables
+use DB;
+use DataTables;
 
 class UsersController extends Controller
 {
@@ -18,16 +21,10 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $data = [];
-        $users = Users::all();
-        $assures = DB::table('assures')->get();
-        /*if(count($users)){
-            $data = ['status' => true, 'code' => 200, 'data'=>$users];
-        }else{
-            $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
-        }
-        return $data;*/
-        return view('admin.users.index', compact('users', 'assures'));
+        $assures    = Assured::where('status', '1')->get();
+        $roles      = Role::where('status', '1')->get();
+        $categories = Category::where('parent', 0)->where('status', '1')->get();
+        return view('admin.users.index', compact('assures', 'roles', 'categories'));
     }
     /**
      * Process datatables ajax request.
@@ -35,9 +32,73 @@ class UsersController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function userData(Request $request){
-        // dd($request->all());
-        return Datatables::of(User::all())->make(true);
-        // dd($res);
+        $users = User::with(['category', 'role', 'assured'])->select('users.*');
+
+        return DataTables::of($users)
+                ->addColumn('user_image', function ($users) {
+                    return '<a href="'.$users->user_image.'" data-toggle="lightbox" ><img src="'.$users->user_image.'" alt="'.$users->name.'" height="50" ></a>';
+                })
+                ->addColumn('status', function ($users) {
+                    $checked_status = ($users->status == '1') ? "checked" : "";
+                    return '<input class="update_status" type="checkbox" name="is_active" value="1" data-user_id="'.$users->id.'" '.$checked_status.'>';
+                })
+                ->addColumn('verify', function ($users) {
+                    $checked_verification = ($users->is_verified == '1') ? "checked" : "";
+                    return '<input type="checkbox" name="is_verified" id="is_verified" value="1" onchange="changeUserVerification(this)" data-user_id="'.$users->id.'" '.$checked_verification.' >';
+                })
+                ->addColumn('select_assured', function ($users) {
+                    $select_assured_1 = ($users->assured_id == '1') ? "selected" : "";
+                    $select_assured_2 = ($users->assured_id == '2') ? "selected" : "";
+                    $select_assured_3 = ($users->assured_id == '3') ? "selected" : "";
+                    $select_assured_4 = ($users->assured_id == '4') ? "selected" : "";
+                    return '<select name="assured_id" id="assured_id" onchange="changeUserAssures(this)" data-user_id="'.$users->id.'">
+                        <option '.$select_assured_1.' value="1">Bronze</option>
+                        <option '.$select_assured_2.' value="2">Sliver</option>
+                        <option '.$select_assured_3.' value="3">Gold</option>
+                        <option '.$select_assured_4.' value="4">Platinum</option>
+                    </select>';
+                })
+                ->addColumn('action', function ($users) {
+                    $btn_html = '';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-info" href="'.route('admin.users.show', $users).'" role="button" title="View"><i class="fas fa-eye"></i></a>&nbsp;';
+                    return $btn_html;
+                })
+                ->addColumn('total_referred', function($users){
+                    $total_count = DB::table('users')->where('referral_by', $users->id)->count();
+                    return '<span class="badge bg-danger">'.$total_count.'</span>';
+                })
+                ->filter(function ($query) use ($request) {
+                    // filter for title
+                    if ($request->input('name') != '') {
+                        $query->where('name', 'like', "%{$request->input('name')}%");
+                    }
+                    // filter for mobile
+                    if ($request->input('mobile') != '') {
+                        $query->where('mobile', 'like', "%{$request->input('mobile')}%");
+                    }
+                    // filter for Category
+                    if ($request->input('category_id') != '') {
+                        $query->where('category_id', $request->input('category_id'));
+                    }
+                    // filter for Role
+                    if ($request->input('role_id') != '') {
+                        $query->where('role_id', $request->input('role_id'));
+                    }
+                    // filter for Assured
+                    if ($request->input('assured_id') != '') {
+                        $query->where('assured_id', $request->input('assured_id'));
+                    }
+                    // filter for is verfiied user
+                    if ($request->input('is_verified') != '') {
+                        $query->where('is_verified', $request->input('is_verified'));
+                    }
+                    // filter for status
+                    if ($request->input('status') != '') {
+                        $query->where('status', $request->input('status'));
+                    }
+                })
+                ->rawColumns(['status', 'verify', 'action', 'user_image', 'select_assured', 'total_referred'])
+                ->make(true);
     }
 
     /**
@@ -121,7 +182,7 @@ class UsersController extends Controller
     public function updateStatus(Request $request){
         $user_id = $request->input('user_id');
         $status = $request->input('status');
-        if($user = Users::find($user_id)){
+        if($user = User::find($user_id)){
             $user->status = ($status == '0') ? '0' : '1';
             $res = $user->save();
             if($res){
@@ -135,7 +196,7 @@ class UsersController extends Controller
     public function updateAssure(Request $request){
         $user_id = $request->input('user_id');
         $assured_id = $request->input('assured_id');
-        if($user = Users::find($user_id)){
+        if($user = User::find($user_id)){
             $user->assured_id = $assured_id;
             $res = $user->save();
             if($res){
@@ -149,8 +210,22 @@ class UsersController extends Controller
     public function updateVerify(Request $request){
         $user_id = $request->input('user_id');
         $verify_value = $request->input('verify_value');
-        if($user = Users::find($user_id)){
+        if($user = User::find($user_id)){
             $user->is_verified = $verify_value;
+            $res = $user->save();
+            if($res){
+                return ['status' => true, 'code' => 200, 'data'=>$user];
+            }
+        }else{
+            return ['status' => false, 'code' => 404, 'message'=>'data not found'];
+        }
+    }
+    /*update user status*/
+    public function updateStatusNew(Request $request){
+        $user_id = $request->input('user_id');
+        $user_status = $request->input('user_status');
+        if($user = User::find($user_id)){
+            $user->status = $user_status;
             $res = $user->save();
             if($res){
                 return ['status' => true, 'code' => 200, 'data'=>$user];

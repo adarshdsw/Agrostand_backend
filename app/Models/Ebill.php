@@ -8,6 +8,9 @@ use App\Models\Category;
 use App\Models\EbillProducts;
 use App\Models\EbillExpenses;
 use App\Models\DriverTracking;
+use App\Models\EbillShipping;
+use App\Models\EbillTransaction;
+use App\Models\Driver;
 
 class Ebill extends Model
 {
@@ -23,7 +26,7 @@ class Ebill extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'vendor_id', 'order_id', 'bill_number', 'specification', 'ship_to', 'bill_to', 'bill_date', 'due_date', 'advance_amount', 'due_amount', 'total_amount', 'status', 'rfp_status', 'decline_reason', 'seller_type'
+        'user_id', 'vendor_id', 'order_id', 'bill_number', 'specification', 'ship_to', 'bill_to', 'bill_date', 'due_date', 'advance_amount', 'due_amount', 'total_amount', 'status', 'rfp_status', 'decline_reason', 'seller_type',
     ];
 
     /**
@@ -81,4 +84,25 @@ class Ebill extends Model
     {
         return $this->hasOne(DriverTracking::class, 'ebill_id', 'id');
     }
+
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function shipping()
+    {
+        return $this->hasOne(EbillShipping::class, 'ebill_id', 'id');
+    }
+
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function transaction()
+    {
+        return $this->hasOne(EbillTransaction::class, 'ebill_id', 'id');
+    }
+
 }

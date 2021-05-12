@@ -49,7 +49,11 @@
                                           @if($category->parent == 0 )
                                           <tr>
                                              <td>{{ $counter }}</td>
-                                             <td><img src="{{ $category->icon }}" alt="{{ $category->title }}" width="75" height="75"></td>
+                                             <td>
+                                                <a href="{{ ($category->icon) ? $category->icon : '' }}" data-toggle="lightbox" data-(width|height)="[0-9]+">
+                                                   <img src="{{ $category->icon }}" alt="{{ $category->title }}" width="75" height="75">
+                                                </a>
+                                             </td>
                                              <td>{{ $category->title }}</td>
                                              <td>{{ $category->title_hindi }}</td>
                                              <td>{{ $category->slug }}</td>
@@ -96,7 +100,11 @@
                                           ?>
                                           <tr>
                                              <td>{{ $counter }}</td>
-                                             <td><img src="{{ $subcategory->icon }}" alt="{{ $subcategory->title }}" width="75" height="75"></td>
+                                             <td>
+                                                <a href="{{ ($subcategory->icon) ? $subcategory->icon : '' }}" data-toggle="lightbox" data-(width|height)="[0-9]+">
+                                                   <img src="{{ $subcategory->icon }}" alt="{{ $subcategory->title }}" width="75" height="75">
+                                                </a>
+                                             </td>
                                              <td>{{ $parent->title }}</td>
                                              <td>{{ $subcategory->title }}</td>
                                              <td>{{ $subcategory->title_hindi }}</td>
@@ -143,6 +151,11 @@
          "info": true,
          "autoWidth": false,
          "responsive": true,
+      });
+      // preview lightbox image
+      $(document).on('click', '[data-toggle="lightbox"]', function(event) {
+         event.preventDefault();
+         $(this).ekkoLightbox();
       });
    });
 

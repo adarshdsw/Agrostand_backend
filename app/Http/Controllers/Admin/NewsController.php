@@ -4,8 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Models\User;
 use App\Models\NewsImage;
 use Illuminate\Http\Request;
+use Collective\Html\FormBuilder;
+// notification
+use App\Notifications\NewNewsCreated;
+// Datatables
+use DB;
+use DataTables;
 
 class NewsController extends Controller
 {
@@ -36,9 +43,39 @@ class NewsController extends Controller
      */
     public function newsList()
     {
-        $data = [];
-        $newses = News::all();
-        return view('admin.news.index', compact('newses'));
+        return view('admin.news.index');
+    }
+    // News Data Table
+    public function newsData(Request $request){
+        // get news specific column for datatable
+        $news = News::select(['id', 'feature_img', 'title', 'title_hindi', 'description', 'news_date', 'status', 'created_at']);
+        // dd($news);
+        return DataTables::of($news)
+                ->addColumn('feature_img', function ($news) {
+                    return '<a href="'.$news->feature_img.'" data-toggle="lightbox" ><img src="'.$news->feature_img.'"  height="50" ></a>';
+                })
+                ->addColumn('status', function ($news) {
+                    return ($news->status == 0) ? "<span class='badge bg-danger'>Inactive</span>" : "<span class='badge bg-success'>Active</span>";
+                })
+                ->addColumn('action', function ($news) {
+                    $btn_html = '';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-info" href="'.route('admin.news.show', $news).'" role="button" title="View"><i class="fas fa-eye"></i></a>&nbsp;';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-success" href="'.route('admin.news.edit', $news).'" role="button" title="Edit"><i class="fas fa-pencil-alt"></i></a>&nbsp;';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-danger ajax-delete" href="'.route('admin.news.delete', $news).'" role="button" title="Delete" data-programme_id="'.$news->id.'"><i class="fas fa-trash"></i></a>&nbsp;';
+                    return $btn_html;
+                })
+                ->filter(function ($query) use ($request) {
+                    // filter for title
+                    if ($request->input('title') != '') {
+                        $query->where('title', 'like', "%{$request->input('title')}%");
+                    }
+                    // filter for status
+                    if ($request->input('status') != '') {
+                        $query->where('status', $request->input('status'));
+                    }
+                })
+                ->rawColumns(['status', 'action', 'feature_img'])
+                ->make(true);
     }
 
     /**
@@ -137,6 +174,19 @@ class NewsController extends Controller
         $news->status = $request->input('status');
         $res = $news->save();
         if($res){
+            // list of all users
+            /*$users = User::where('status','1')->get();
+            // if users are not empty
+            if(!empty($users)){
+                foreach($users as $user){
+                    try{
+                        $user->notify(new NewNewsCreated($news));
+                    }catch(Exception $e){
+                        report($e);
+                        return false;
+                    }
+                }
+            }*/
             return redirect(route('admin.news.index'))->with('success', __('The news has been successfully added'));
         }else{
             return redirect(route('admin.news.index'))->with('fail', __('Something went wrong'));

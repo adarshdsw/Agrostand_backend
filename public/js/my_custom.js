@@ -225,13 +225,13 @@ var sbm = (function () {
 	var destroy = function (event, that, url, swalTitle, confirmButtonText, cancelButtonText, errorAjax) {
 		event.preventDefault()
 		Swal.fire({
-			title: "Are you sure?",
+			title: swalTitle,
 			text: "You won't be able to revert this!",
 			type: "warning",
 			showCancelButton: !0,
 			confirmButtonColor: "#3085d6",
 			cancelButtonColor: "#d33",
-			confirmButtonText: "Yes, delete it!",
+			confirmButtonText: confirmButtonText,
 			confirmButtonClass: "btn btn-primary",
 			cancelButtonClass: "btn btn-danger ml-1",
 			buttonsStyling: !1,
@@ -277,6 +277,118 @@ var sbm = (function () {
 		})*/
 	}
 
+	var accept = function (event, that, url, swalTitle, confirmButtonText, cancelButtonText, errorAjax) {
+		event.preventDefault()
+		Swal.fire({
+			title: swalTitle,
+			text: "You won't be able to revert this!",
+			type: "warning",
+			showCancelButton: !0,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: confirmButtonText,
+			confirmButtonClass: "btn btn-primary",
+			cancelButtonClass: "btn btn-danger ml-1",
+			buttonsStyling: !1,
+		}).then(function (t) {
+		  if(t.value){
+			var id = that.data('menu_id');
+			var token = $("meta[name='csrf-token']").attr("content");
+			$.ajax({
+				url: that.attr('href'),
+				type: 'POST',
+				dataType: 'JSON',
+				data:{
+					'id': id,
+					'_token': token,
+				},
+				success : function(res){
+					if(res != 'false'){
+						Swal.fire({ type: "success", title: "Accepted!", text: "Your Shipping has been accepted.", confirmButtonClass: "btn btn-success" });
+						// that.parents('tr').remove();
+						location.reload();
+					}else{
+						Swal.fire({ title: "Error", text: "Something went wrong :)", type: "error", confirmButtonClass: "btn btn-danger" });
+					}
+				},
+				fail : function(error){
+					console.log(error)
+				}
+			})    
+		  }else{
+			Swal.fire({ title: "Cancelled", text: "Your imaginary file is safe :)", type: "error", confirmButtonClass: "btn btn-success" });
+		  }
+		});
+		
+		/*Swal({
+			title: swalTitle,
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: '#DD6B55',
+			confirmButtonText: confirmButtonText,
+			cancelButtonText: cancelButtonText
+		}).then(function () {
+			console.log(that); return false;
+			ajax(that.attr('href'), 'DELETE', url, errorAjax)
+		})*/
+	}
+
+	var decline = function (event, that, url, swalTitle, confirmButtonText, cancelButtonText, errorAjax) {
+		event.preventDefault()
+		Swal.fire({
+			title: swalTitle,
+			text: "You won't be able to revert this!",
+			type: "warning",
+			showCancelButton: !0,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: confirmButtonText,
+			confirmButtonClass: "btn btn-primary",
+			cancelButtonClass: "btn btn-danger ml-1",
+			buttonsStyling: !1,
+		}).then(function (t) {
+		  if(t.value){
+			var id = that.data('menu_id');
+			var token = $("meta[name='csrf-token']").attr("content");
+			$.ajax({
+				url: that.attr('href'),
+				type: 'POST',
+				dataType: 'JSON',
+				data:{
+					'id': id,
+					'_token': token,
+				},
+				success : function(res){
+					if(res != 'false'){
+						Swal.fire({ type: "success", title: "Decline!", text: "Your file has been declined.", confirmButtonClass: "btn btn-success" });
+						// that.parents('tr').remove();
+						location.reload();
+					}else{
+						Swal.fire({ title: "Error", text: "Something went wrong :)", type: "error", confirmButtonClass: "btn btn-danger" });
+					}
+				},
+				fail : function(error){
+					console.log(error)
+				}
+			})    
+		  }else{
+			Swal.fire({ title: "Cancelled", text: "Your imaginary file is safe :)", type: "error", confirmButtonClass: "btn btn-success" });
+		  }
+		});
+		
+		/*Swal({
+			title: swalTitle,
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: '#DD6B55',
+			confirmButtonText: confirmButtonText,
+			cancelButtonText: cancelButtonText
+		}).then(function () {
+			console.log(that); return false;
+			ajax(that.attr('href'), 'DELETE', url, errorAjax)
+		})*/
+	}
+
 	return {
 		ajax     : ajax,
 		spin     : spin,
@@ -284,6 +396,8 @@ var sbm = (function () {
 		loadHtml : loadHtml,
 		loadView : loadView,
 		destroy  : destroy,
+		accept   : accept,
+		decline  : decline,
 		loadMultiPartForm  : loadMultiPartForm,
 	}
 

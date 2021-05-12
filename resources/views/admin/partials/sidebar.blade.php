@@ -1,8 +1,8 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
    <!-- Brand Logo -->
    <a href="{{ route('admin.dashboard') }}" class="brand-link">
-      <img src="{{ asset('adminlte/dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">{{config('app.name')}}</span>
+      <img src="{{ asset('img/logo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8; background-color:#fff;">
+      <span class="brand-text font-weight-light">AGROSTAND</span>
    </a>
    <!-- Sidebar -->
    <div class="sidebar">
@@ -108,6 +108,98 @@
                   </p>
                </a>
             </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.drivers.index') }}" class="nav-link {{ ($title == 'Drivers') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Agrostand Driver
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.ebills.index') }}" class="nav-link {{ ($title == 'Ebills') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Ebills
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.ebill.shipping.index') }}" class="nav-link {{ ($title == 'Shippings') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Agro Delivery
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.driver_assignments.index') }}" class="nav-link {{ ($title == 'Driver Assignments') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Driver Assignments
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.ebill.holding.payment') }}" class="nav-link {{ ($title == 'Holding Payment') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Agro Pay
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.villages.index') }}" class="nav-link {{ ($title == 'Villages') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Villages
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.agromeets.index') }}" class="nav-link {{ ($title == 'Agromeets') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Agromeets
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.profile') }}" class="nav-link {{ ($title == 'Profile') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Profile
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.settings') }}" class="nav-link {{ ($title == 'Settings') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Settings
+                  </p>
+               </a>
+            </li>
+
+            <li class="nav-item menu-open">
+               <a href="{{ route('admin.bank') }}" class="nav-link {{ ($title == 'Admin Bank') ? 'active' : '' }}">
+                  <i class="nav-icon fa fa-star"></i>
+                  <p>
+                     Agro Bank A/c
+                  </p>
+               </a>
+            </li>
+
+
 
             <li class="nav-item menu-open">
                <a href="javascript:;" class="nav-link" onclick="event.preventDefault(); document.querySelector('#admin-logout-form').submit();">

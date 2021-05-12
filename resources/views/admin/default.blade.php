@@ -43,6 +43,8 @@
 		<link rel="stylesheet" href="{{ asset('plugins/summernote/summernote-bs4.css')}}">
 		<!-- Toastr -->
   		<link rel="stylesheet" href="{{ asset('plugins/toastr/toastr.min.css') }}">
+		<!-- ello Lightbox -->
+  		<link rel="stylesheet" href="{{ asset('plugins/ekko-lightbox/ekko-lightbox.css') }}">
 		<!-- Google Font: Source Sans Pro -->
 		<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 
@@ -88,6 +90,10 @@
 
 		</div>
 
+		<script type="text/javascript">
+			var base_url = "{{ url('/') }}";
+		</script>
+
 		<script src="{{ asset('plugins/jquery/jquery.min.js')}}"></script>
 		<!-- jQuery UI 1.11.4 -->
 		<script src="{{ asset('plugins/jquery-ui/jquery-ui.min.js')}}"></script>
@@ -132,6 +138,8 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
 		<!-- sweet-alert2 js -->
 		<script src="{{ asset('plugins/sweetalert2/sweetalert2.js')}}"></script>
+		<!-- ekko-lightbox js -->
+		<script src="{{ asset('plugins/ekko-lightbox/ekko-lightbox.js')}}"></script>
 		<!-- Backend JS -->
 		<script src="{{ asset('js/back.js')}}"></script>
 		<!-- My Custom JS -->
@@ -139,6 +147,15 @@
 		<!-- ck editor -->
 	    <script type="text/javascript" src="//cdn.ckeditor.com/4.15.1/standard/ckeditor.js"></script>
 	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.15.1/adapters/jquery.min.js"></script>
+	    <script type="text/javascript">
+	    	$(function () {
+	    		$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+		        	event.preventDefault();
+		        	$(this).ekkoLightbox();
+		      	});
+	    	});
+	    </script>
+		
 		@yield('js')
 
 	</body>

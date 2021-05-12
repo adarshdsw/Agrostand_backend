@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Commodity;
 use App\Models\Category;
+use DataTables;
 
 class CommodityController extends Controller
 {
@@ -34,8 +35,44 @@ class CommodityController extends Controller
     {
         $data = [];
         $commodities = Commodity::with('subcategory')->get();
-        // dd($commodities);
         return view('admin.commodities.index', compact('commodities'));
+    }
+
+    public function commodityData(Request $request){
+        $commodities = Commodity::with(['subcategory'])->select('commodities.*');
+
+        return DataTables::of($commodities)
+                ->addColumn('icon', function ($commodities) {
+                    return '<a href="'.$commodities->icon.'" data-toggle="lightbox" ><img src="'.$commodities->icon.'" alt="'.$commodities->title.'" height="50" ></a>';
+                })
+                ->addColumn('status', function ($commodities) {
+                    return ($commodities->status == 0) ? "<span class='badge bg-danger'>Inactive</span>" : "<span class='badge bg-success'>Active</span>";
+                })
+                ->addColumn('subcategory_title', function ($commodities) {
+                    return ($commodities->subcategory) ? $commodities->subcategory->title : '';
+                })
+                ->addColumn('action', function ($commodities) {
+                    $btn_html = '';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-success ajax-edit" href="'.route('admin.commodity.edit', $commodities).'" role="button" title="Edit"><i class="fas fa-pencil-alt"></i></a>';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-danger ajax-delete" href="'.route('admin.commodity.delete', $commodities).'" role="button" title="Delete" data-menu_id="'.$commodities->id.'"><i class="fas fa-trash-alt"></i></a>';
+                    return $btn_html;
+                })
+                ->filter(function ($query) use ($request) {
+                    // filter for title
+                    if ($request->input('name') != '') {
+                        $query->where('name', 'like', "%{$request->input('name')}%");
+                    }
+                    // filter for Category
+                    if ($request->input('subcategory_id') != '') {
+                        $query->where('subcategory_id', $request->input('subcategory_id'));
+                    }
+                    // filter for status
+                    if ($request->input('status') != '') {
+                        $query->where('status', $request->input('status'));
+                    }
+                })
+                ->rawColumns(['status', 'action', 'icon', 'subcategory_title'])
+                ->make(true);
     }
 
     /**

@@ -18,6 +18,7 @@
                         <thead>
                            <tr>
                               <th style="width: 10px">#</th>
+                              <th>Category</th>
                               <th>Title</th>
                               <th>Title Hindi</th>
                               <th>Status</th>
@@ -32,6 +33,7 @@
                               @foreach($pgroups as $pgroup)
                                  <tr>
                                     <td>{{ $counter }}</td>
+                                    <td>{{ ($pgroup->category) ? $pgroup->category->title : '' }}</td>
                                     <td>{{ $pgroup->title }}</td>
                                     <td>{{ $pgroup->title_hindi }}</td>
                                     <td><?= ($pgroup->status == 0) ? "<span class='badge bg-danger'>Inactive</span>" : "<span class='badge bg-success'>Active</span>"; ?></td>
@@ -93,14 +95,14 @@
             event.preventDefault();
             var that  = $(this);
             var url   = that.attr('href');
-            var title = "Unit Edit";
+            var title = "Product Group Edit";
             sbm.loadMultiPartForm(url, $(this), errorAjax, title);
          })
          .on('click', 'td a.ajax-view', function (event) {
             event.preventDefault();
             var that  = $(this);
             var url   = that.attr('href');
-            var title = "Unit View";
+            var title = "Product Group View";
             sbm.loadMultiPartForm(title, event, $(this), url)
          })
          .on('click', 'td a.ajax-delete', function (event) {

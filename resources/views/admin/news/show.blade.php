@@ -104,7 +104,9 @@
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<img src="{{ $news->feature_img }}" alt="{{ $news->title }}" width="150" height="150">
+												<a href="{{ $news->feature_img }}" data-toggle="lightbox">
+													<img src="{{ $news->feature_img }}" alt="{{ $news->title }}" width="150" height="150">
+												</a>
 											</div>
 										</div>
 										<!-- <div class="col-md-6">

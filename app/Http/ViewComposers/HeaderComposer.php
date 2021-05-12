@@ -23,6 +23,7 @@ class HeaderComposer
         // dd($elements, $segments);
         foreach ($segments as $segment) {
             if (!is_numeric($segment)) {
+                // dd($elements);
                 $elements[$segment]['name'] = __('admin.breadcrumbs.' . $elements[$segment]['name'] . '-name');
                 if($segment === end($segments)) {
                     $elements[$segment]['url'] = '#';
@@ -30,12 +31,14 @@ class HeaderComposer
                 $breadcrumbs[] = $elements[$segment];
             }
         }
+        // dd($breadcrumbs);
         // dd(Route::currentRouteName());
         // Title
         $title = config('titles.' . Route::currentRouteName());
+        // echo $title;die;
         $title = __('admin.titles.' . $title);
         $base_url = url('/');
-
+        // dd($base_url);
         // Notifications
         $countNotifications = 0;
         // $countNotifications = auth()->user()->unreadNotifications()->count();

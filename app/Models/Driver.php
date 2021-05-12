@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 // use App\Models\Ebill;
 
 class Driver extends Model
 {
+    use Notifiable;
     /**
      * The table associated with the model.
      *
@@ -19,7 +21,7 @@ class Driver extends Model
      * @var array
      */
     protected $fillable = [
-        'name','mobile','profile_image','driver_otp','is_verify', 'status'
+        'name','mobile','user_name','password','conf_password','profile_image','driver_otp','is_verify', 'status'
     ];
 
     /**
@@ -42,8 +44,19 @@ class Driver extends Model
      * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    /*public function ebill()
+    public function tracking()
     {
-        return $this->belongsTo(Ebill::class, 'ebill_id', 'id');
-    }*/
+        return $this->hasMany(DriverTracking::class, 'driver_id', 'id');
+        // return $this->hasOne(DriverTracking::class, 'driver_id', 'id');
+    }
+
+    /**
+     * Specifies the user's FCM token
+     *
+     * @return string|array
+     */
+    public function routeNotificationForFcm()
+    {
+        return $this->device_id;
+    }
 }

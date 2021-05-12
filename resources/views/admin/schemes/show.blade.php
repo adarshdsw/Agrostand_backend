@@ -30,14 +30,14 @@
 						<div class="card-body">
 							<!-- /.card-header -->
 							<!-- form start -->
-							<form role="form" method="POST" action="{{ route('admin.news.store') }}" enctype="multipart/form-data" id="update_intro">
+							<form role="form" enctype="multipart/form-data" id="update_intro">
 								@csrf
 								<div class="card-body">
 									<div class="row">
 										<div class="col-md-8">
 											<div class="form-group">
 												<label for="title">Title</label><span class="text-danger">&#42;</span>
-												<input disabled type="text" class="form-control" id="title" name="title" placeholder="Enter title" value="{{ isset($news) ? $news->title : old('title') }}">
+												<input disabled type="text" class="form-control" id="title" name="title" placeholder="Enter title" value="{{ isset($scheme) ? $scheme->title : old('title') }}">
 												@if ($errors->has('title'))
 													<p class="text-danger" role="alert">
 														<strong>{{ $errors->first('title') }}</strong>
@@ -49,7 +49,7 @@
 											<div class="form-group">
 							                  	<label>News Date:</label>
 							                    <div class="input-group date" id="news_date" data-target-input="nearest">
-							                        <input disabled type="text" class="form-control datetimepicker-input" data-target="#news_date" name="news_date" value="{{ $news->news_date }}">
+							                        <input disabled type="text" class="form-control datetimepicker-input" data-target="#news_date" name="news_date" value="{{ isset($scheme) ? $scheme->news_date : old('news_date') }}">
 							                        <div class="input-group-append" data-target="#news_date" data-toggle="datetimepicker">
 							                            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
 							                        </div>
@@ -66,7 +66,7 @@
 										<div class="col-md-8">
 											<div class="form-group">
 												<label for="title_hindi">Title Hindi</label>
-												<input disabled type="text" class="form-control" id="title_hindi" name="title_hindi" placeholder="Enter title_hindi" value="{{ isset($news) ? $news->title_hindi : old('title_hindi') }}">
+												<input disabled type="text" class="form-control" id="title_hindi" name="title_hindi" placeholder="Enter title_hindi" value="{{ isset($scheme) ? $scheme->title_hindi : old('title_hindi') }}">
 												@if ($errors->has('title_hindi'))
 													<p class="text-danger" role="alert">
 														<strong>{{ $errors->first('title_hindi') }}</strong>
@@ -79,7 +79,7 @@
 										<div class="col-md-12">
 											<div class="form-group">
 												<label for="description">Description</label><span class="text-danger">&#42;</span>
-												<textarea disabled class="form-control" id="description" name="description" rows="5">{{ isset($news) ? $news->description : old('description') }}</textarea>
+												<textarea disabled class="form-control" id="description" name="description" rows="5">{{ isset($scheme) ? $scheme->description : old('description') }}</textarea>
 												@if ($errors->has('description'))
 													<p class="text-danger" role="alert">
 														<strong>{{ $errors->first('description') }}</strong>
@@ -92,7 +92,7 @@
 										<div class="col-md-12">
 											<div class="form-group">
 												<label for="description_hindi">Description Hindi</label>
-												<textarea disabled class="form-control" id="description_hindi" name="description_hindi" rows="5">{{ isset($news) ? $news->description_hindi : old('description_hindi') }}</textarea>
+												<textarea disabled class="form-control" id="description_hindi" name="description_hindi" rows="5">{{ isset($scheme) ? $scheme->description_hindi : old('description_hindi') }}</textarea>
 												@if ($errors->has('description_hindi'))
 													<p class="text-danger" role="alert">
 														<strong>{{ $errors->first('description_hindi') }}</strong>
@@ -104,7 +104,9 @@
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<img src="{{ $news->feature_img }}" alt="{{ $news->title }}" width="150" height="150">
+												<a href="{{ $scheme->feature_img }}" data-toggle="lightbox">
+													<img src="{{ isset($scheme) ? $scheme->feature_img : '' }}" alt="{{ isset($scheme) ? $scheme->title : '' }}" width="150" height="150">
+												</a>
 											</div>
 										</div>
 										<!-- <div class="col-md-6">
@@ -128,8 +130,8 @@
 											<div class="form-group">
 					   							<label for="status">Status</label>
 					   							<select disabled class="form-control" id="status" name="status">
-					   								<option {{ ($news->status == 1) ? "selected" : "" }} value="1"> Active </option>
-					   								<option {{ ($news->status == 0) ? "selected" : "" }} value="0"> Inactive </option>
+					   								<option {{ isset($scheme) ? (($scheme->status == 1) ? "selected" : "") : "" }} value="1"> Active </option>
+					   								<option {{ isset($scheme) ? (($scheme->status == 0) ? "selected" : "") : "" }} value="0"> Inactive </option>
 					   							</select>
 											</div>
 				   						</div>

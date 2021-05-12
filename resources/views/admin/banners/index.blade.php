@@ -46,7 +46,11 @@
 							@foreach($banners as $banner)
 									<tr>
 										<td>{{ $counter }}</td>
-										<td><img src="{{ $banner->feature_img }}" alt="{{ $banner->title }}" width="75" height="75"></td>
+										<td>
+											<a href="{{ ($banner->feature_img) ? $banner->feature_img : '' }}" data-toggle="lightbox">
+												<img src="{{ $banner->feature_img }}" width="75" height="75">
+											</a>
+										</td>
 										<td>{{ $banner->title }}</td>
 										<td>{{ $banner->title_hindi }}</td>
 										<td>{{ substr($banner->description, 0,50) }}...</td>
@@ -90,6 +94,10 @@
 		 "autoWidth": false,
 		 "responsive": true,
 	  });
+	  	$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+        	event.preventDefault();
+        	$(this).ekkoLightbox();
+      	});
    });
 
 	var slider = (function () {

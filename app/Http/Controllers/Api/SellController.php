@@ -9,6 +9,10 @@ use App\Models\SellLeadImage;
 use App\Models\SellRequest;
 use Illuminate\Http\Request;
 
+// Notificarion
+use App\Notifications\NotifySellLead;
+use App\Notifications\NotifySellRequestToVendor;
+
 class SellController extends Controller
 {
     /**
@@ -19,6 +23,8 @@ class SellController extends Controller
     public function index(Request $request)
     {
         $perameters     = $request->all();
+        // echo "<pre>"; print_r($perameters); die;
+        $user_id        = $request->input('user_id');
         $category_id    = $request->input('category_id');
         $subcategory_id = $request->input('subcategory_id');
         $commodity_id   = $request->input('commodity_id');
@@ -27,55 +33,99 @@ class SellController extends Controller
         $column_name    = $request->input('column_name');
         $sort_by        = $request->input('sort_by');
 
-        $vendors = User::with('category', 'subcategory', 'commodity')
-                        ->where('status', '1')->where('role_id', '!=', 1)
+        $vendors = User::with('category', 'subcategory', 'userCommodity', 'address', 'products')
+                        // user should be active //user should be only business // list of user except own id
+                        ->where('status', '1')->where('role_id', '!=', 1)->where('id', '!=', $user_id)
+                        // filter by catagory of user
                         ->when ((isset($category_id) && $category_id !== '' && !empty($category_id) ), function ($query) use ($perameters) {
                             $query->where('category_id', $perameters['category_id']);
                         })
+                        // filter by subcatagory of user
                         ->when ((isset($subcategory_id) && $subcategory_id !== '' && !empty($subcategory_id) ), function ($query) use ($perameters) {
                             $query->where('subcategory_id', $perameters['subcategory_id']);
                         })
-                        ->when ((isset($commodity_id) && $commodity_id !== '' && !empty($commodity_id) ), function ($query) use ($perameters) {
-                            $query->where('commodity_id', $perameters['commodity_id']);
+                        // filter by commodity of user
+                        ->whereHas('userCommodity', function($query) use($perameters) {
+                            // if commodity not empty or null
+                            $commodity_id   = isset($perameters['commodity_id']) ? $perameters['commodity_id'] : 0;
+                            if(isset($commodity_id) && !empty($commodity_id)  && $commodity_id != '' && is_numeric($commodity_id) ){
+                                $query->where('commodity_id', $commodity_id);
+                            }
                         })
-                        ->when ((isset($perameters['state_id']) && $perameters['state_id'] !== '' && !empty($perameters['state_id']) ), function ($query) use ($perameters) {
-                            $query->where('state_id', $perameters['state_id']);
+                        // filter by location of user
+                        ->whereHas('address', function($query) use($perameters) {
+                            $state_id    = isset($perameters['state_id']) ? $perameters['state_id'] : 0;
+                            $district_id = isset($perameters['district_id']) ? $perameters['district_id'] : 0;
+                            $city_id     = isset($perameters['city_id']) ? $perameters['city_id'] : 0;
+                            // if filter by state id
+                            if(isset($state_id) && !empty($state_id)  && $state_id != '' && is_numeric($state_id) ){
+                                $query->where('state_id', $perameters['state_id']);
+                            }
+                            // if filter by district
+                            if(isset($district_id) && !empty($district_id)  && $district_id != '' && is_numeric($district_id) ){
+                                $query->where('district', $perameters['district_id']);
+                            }
+                            // if filter by city
+                            if(isset($city_id) && !empty($city_id)  && $city_id != '' && is_numeric($district_id) ){
+                                $query->where('city', $perameters['city_id']);
+                            }
                         })
-                        ->when ((isset($perameters['district_id']) && $perameters['district_id'] !== '' && !empty($perameters['district_id']) ), function ($query) use ($perameters) {
-                            $query->where('district_id', $perameters['district_id']);
-                        })
-                        ->when ((isset($perameters['city_id']) && $perameters['city_id'] !== '' && !empty($perameters['city_id']) ), function ($query) use ($perameters) {
-                            $query->where('city_id', $perameters['city_id']);
-                        })
+                        // filter by assurity like bronze, sliver, gold, platinum
                         ->when ((isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ), function ($query) use ($perameters) {
                             $query->where('assured_id', $perameters['assured_id']);
+                        })
+                        // filter by average ratting
+                        ->when ((isset($perameters['avg_ratting']) && $perameters['avg_ratting'] !== '' && !empty($perameters['avg_ratting']) ), function ($query) use ($perameters) {
+                            $query->where('avg_ratting', $perameters['avg_ratting']);
+                        })
+                        // filter by distance
+                        ->when ((isset($perameters['radius']) && $perameters['radius'] !== '' && !empty($perameters['radius']) ), function ($query) use ($perameters) {
+                            $coordinates['latitude']    = isset($perameters['latitude']) ? $perameters['latitude'] : '';
+                            $coordinates['longitude']   = isset($perameters['longitude']) ? $perameters['longitude'] : '';
+                            // if filter by user distance
+                            $radius    = isset($perameters['radius']) ? $perameters['radius'] : '';
+                            $query->isWithinMaxDistance($coordinates, $radius);
                         })
                         ->offset($offset)
                         ->limit($limit)
                         ->orderBy($column_name, $sort_by)
                         ->get();
-        $total_count = User::with('category', 'subcategory', 'commodity')
-                        ->where('status', '1')->where('role_id', '!=', 1)
+        $total_count = User::with('category', 'subcategory', 'userCommodity', 'address')
+                        ->where('status', '1')->where('role_id', '!=', 1)->where('id', '!=', $user_id)
                         ->when ((isset($category_id) && $category_id !== '' && !empty($category_id) ), function ($query) use ($perameters) {
                             $query->where('category_id', $perameters['category_id']);
                         })
                         ->when ((isset($subcategory_id) && $subcategory_id !== '' && !empty($subcategory_id) ), function ($query) use ($perameters) {
                             $query->where('subcategory_id', $perameters['subcategory_id']);
                         })
-                        ->when ((isset($commodity_id) && $commodity_id !== '' && !empty($commodity_id) ), function ($query) use ($perameters) {
-                            $query->where('commodity_id', $perameters['commodity_id']);
+                        ->whereHas('userCommodity', function($query) use($perameters) {
+                            $commodity_id    = isset($perameters['commodity_id']) ? $perameters['commodity_id'] : 0;
+                            if(isset($commodity_id) && !empty($commodity_id)  && $commodity_id != '' && is_numeric($commodity_id) ){
+                                $query->where('commodity_id', $perameters['commodity_id']);
+                            }
                         })
-                        ->when ((isset($perameters['state_id']) && $perameters['state_id'] !== '' && !empty($perameters['state_id']) ), function ($query) use ($perameters) {
-                            $query->where('state_id', $perameters['state_id']);
-                        })
-                        ->when ((isset($perameters['district_id']) && $perameters['district_id'] !== '' && !empty($perameters['district_id']) ), function ($query) use ($perameters) {
-                            $query->where('district_id', $perameters['district_id']);
-                        })
-                        ->when ((isset($perameters['city_id']) && $perameters['city_id'] !== '' && !empty($perameters['city_id']) ), function ($query) use ($perameters) {
-                            $query->where('city_id', $perameters['city_id']);
+                        ->whereHas('address', function($query) use($perameters) {
+                            $state_id    = isset($perameters['state_id']) ? $perameters['state_id'] : 0;
+                            $district_id = isset($perameters['district_id']) ? $perameters['district_id'] : 0;
+                            $city_id     = isset($perameters['city_id']) ? $perameters['city_id'] : 0;
+                            // if filter by state id
+                            if(isset($state_id) && !empty($state_id)  && $state_id != '' && is_numeric($state_id) ){
+                                $query->where('state_id', $perameters['state_id']);
+                            }
+                            // if filter by district
+                            if(isset($district_id) && !empty($district_id)  && $district_id != '' && is_numeric($district_id) ){
+                                $query->where('district', $perameters['district_id']);
+                            }
+                            // if filter by city
+                            if(isset($city_id) && !empty($city_id)  && $city_id != '' && is_numeric($district_id) ){
+                                $query->where('city', $perameters['city_id']);
+                            }
                         })
                         ->when ((isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ), function ($query) use ($perameters) {
                             $query->where('assured_id', $perameters['assured_id']);
+                        })
+                        ->when ((isset($perameters['avg_ratting']) && $perameters['avg_ratting'] !== '' && !empty($perameters['avg_ratting']) ), function ($query) use ($perameters) {
+                            $query->where('avg_ratting', $perameters['avg_ratting']);
                         })
                         ->count();
         if($vendors){
@@ -114,6 +164,7 @@ class SellController extends Controller
         $sell->crop_catelog_id = ($post['crop_catelog_id']) ? $post['crop_catelog_id'] : 0;
         $sell->product_title   = ($post['product_title']) ? $post['product_title'] : '';
         $sell->product_quantity = ($post['product_quantity']) ? $post['product_quantity'] : '0';
+        $sell->product_variaty  = ($post['product_variaty']) ? $post['product_variaty'] : '';
         $sell->grade           = ($post['grade']) ? $post['grade'] : '';
         $sell->unit            = ($post['unit']) ? $post['unit'] : 0;
         $sell->selling_date    = ($post['selling_date']) ? $post['selling_date'] : 0;
@@ -125,10 +176,10 @@ class SellController extends Controller
         $sell->city_id         = ($post['city_id']) ? $post['city_id'] : 0;
         $sell->latitude        = ($post['latitude']) ? $post['latitude'] : '';
         $sell->longitude       = ($post['latitude']) ? $post['latitude'] : '';
-        // dd($sell);
         $res = $sell->save();
+        // dd($res);
 
-        if($res){
+        if($res == 'true'){
             $files = $request->file('sell_lead_image');
             if($files){
                 $img_extra = [];
@@ -145,6 +196,14 @@ class SellController extends Controller
                     $img_extra[] = $row;
                 }
                 SellLeadImage::insert($img_extra);
+            }
+            // list of all vendors which belongs to searched category, subcategory, commodity
+            $vendors = $this->vendorList($request);
+            // if vendors are not empty
+            if(!empty($vendors)){
+                foreach($vendors as $vendor){
+                    $vendor->notify(new NotifySellLead($sell));
+                }
             }
             $data = ['status' => true, 'code' => 200, 'data'=>$sell];
         }else{
@@ -193,9 +252,17 @@ class SellController extends Controller
      * @param  \App\Models\Sell  $sell
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Sell $sell)
+    public function destroy(Request $request)
     {
-        //
+        $selllead_id = $request->input('selllead_id');
+        $selllead = Sell::find($selllead_id);
+        if($selllead){
+            SellLeadImage::where('sell_lead_id', $selllead->id)->delete();
+            $res = $selllead->delete();
+            return ['status' => true, 'code' => 200, 'message'=>__('messages.response.success_lead_delete')];
+        }else{
+            return ['status' => false, 'code' => 404, 'message'=>__('messages.response.error_404')];
+        }
     }
 
     public function sellRequestVendor(Request $request){
@@ -223,26 +290,51 @@ class SellController extends Controller
         }
         // dd($res);
         if($res){
-            $data = ['status' => true, 'code' => 200];
+            $seller = User::find($seller_id);
+            if(!empty($seller)){
+                if($vendors){
+                    $data = [];
+                    foreach($vendors as $vendor){
+                        $userTo = User::find($vendor);
+                        if(!empty($userTo)){
+                            $userTo->notify(new NotifySellRequestToVendor($seller));
+                        }
+                    }
+                }
+            }
+            $data = ['status' => true, 'code' => 200, 'message'=>__('messages.response.success_sell_request')];
         }else{
-            $data = ['status' => false, 'code' => 500, 'msg'=>'Something went wrong'];
+            $data = ['status' => false, 'code' => 500, 'msg'=>__('messages.response.error_500')];
         }
         return $data;
     }
 
     public function leadList(Request $request){
         $perameters = $request->all();
-        // dd($perameters);
         $user_id        = $request->input('user_id');
+        // filter by category wise
         $category_id    = $request->input('category_id');
         $subcategory_id = $request->input('subcategory_id');
         $commodity_id   = $request->input('commodity_id');
+        // filter by location wise
+        $state_id       = $request->input('state_id');
+        $district_id    = $request->input('district_id');
+        $city_id        = $request->input('city_id');
+
         $offset         = $request->input('offset');
         $limit          = $request->input('limit');
         $column_name    = $request->input('column_name');
         $sort_by        = $request->input('sort_by');
+
+        $search_str     = ($request->input('product_title')) ? trim($request->input('product_title')) : '';
+        /*if($search_str){
+            $search_str = str_replace(" ", "|", $search_str);
+        }*/
         
         $selllead_list = Sell::with(['user', 'category', 'sellImages'])
+                            ->when (($search_str !== '' && !empty($search_str) ), function ($query) use ($perameters) {
+                                $query->where('product_title', 'like', '%'.$perameters['product_title'].'%');
+                            })
                             ->when (($category_id !== '' && !empty($category_id) ), function ($query) use ($perameters) {
                                 $query->where('category_id', $perameters['category_id']);
                             })
@@ -261,10 +353,25 @@ class SellController extends Controller
                             ->when ((isset($perameters['city_id']) && $perameters['city_id'] !== '' && !empty($perameters['city_id']) ), function ($query) use ($perameters) {
                                 $query->where('city_id', $perameters['city_id']);
                             })
-                            ->when ((isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ), function ($query) use ($perameters) {
+                            /*->when ((isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ), function ($query) use ($perameters) {
                                 $query->whereHas('user', function($query) use ($perameters){
                                     $query->where('assured_id', $perameters['assured_id']);
                                 });
+                            })*/
+                            ->whereHas('user', function($query) use ($perameters){
+                                if( isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ){
+                                    $query->where('assured_id', $perameters['assured_id']);
+                                }
+                                if( isset($perameters['avg_ratting']) && $perameters['avg_ratting'] !== '' && !empty($perameters['avg_ratting']) ){
+                                    $query->where('avg_ratting', $perameters['avg_ratting']);
+                                }
+                                $coordinates['latitude']    = isset($perameters['latitude']) ? $perameters['latitude'] : 0;
+                                $coordinates['longitude']   = isset($perameters['longitude']) ? $perameters['longitude'] : 0;
+                                $radius    = isset($perameters['radius']) ? $perameters['radius'] : '';
+                                // if filter by user distance
+                                if(isset($radius) && !empty($radius)  && $radius != '' ){
+                                    $query->isWithinMaxDistance($coordinates, $radius);
+                                }
                             })
                             ->where('user_id', '!=', $user_id)
                             ->orderBy($column_name, $sort_by)
@@ -273,6 +380,9 @@ class SellController extends Controller
                             ->get();
         
         $buylead_count = Sell::with(['user'])
+                            ->when (($search_str !== '' && !empty($search_str) ), function ($query) use ($perameters) {
+                                $query->where('product_title', 'like', '%'.$perameters['product_title'].'%');
+                            })
                             ->when (($category_id !== '' && !empty($category_id) ), function ($query) use ($perameters) {
                                 $query->where('category_id', $perameters['category_id']);
                             })
@@ -291,10 +401,20 @@ class SellController extends Controller
                             ->when ((isset($perameters['city_id']) && $perameters['city_id'] !== '' && !empty($perameters['city_id']) ), function ($query) use ($perameters) {
                                 $query->where('city_id', $perameters['city_id']);
                             })
-                            ->when ((isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ), function ($query) use ($perameters) {
-                                $query->whereHas('user', function($query) use ($perameters){
+                            ->whereHas('user', function($query) use ($perameters){
+                                if( isset($perameters['assured_id']) && $perameters['assured_id'] !== '' && !empty($perameters['assured_id']) ){
                                     $query->where('assured_id', $perameters['assured_id']);
-                                });
+                                }
+                                if( isset($perameters['avg_ratting']) && $perameters['avg_ratting'] !== '' && !empty($perameters['avg_ratting']) ){
+                                    $query->where('avg_ratting', $perameters['avg_ratting']);
+                                }
+                                $coordinates['latitude']    = isset($perameters['latitude']) ? $perameters['latitude'] : 0;
+                                $coordinates['longitude']   = isset($perameters['longitude']) ? $perameters['longitude'] : 0;
+                                $radius    = isset($perameters['radius']) ? $perameters['radius'] : '';
+                                // if filter by user distance
+                                if(isset($radius) && !empty($radius)  && $radius != '' ){
+                                    $query->isWithinMaxDistance($coordinates, $radius);
+                                }
                             })
                             ->where('user_id', '!=', $user_id)
                             ->count();
@@ -305,6 +425,17 @@ class SellController extends Controller
         }
         return $data;
     }
+
+    public function leadShow($lead_id){
+        if(!empty($lead_id) && $lead_id!='' && is_numeric($lead_id) ){
+            $sell = Sell::with(['user', 'category', 'psubcategory','commodity','city','state','district', 'sellImages'])->where('id', $lead_id)->first();
+            if($sell){
+                return ['status' => true, 'code' => 200, 'data'=>$sell];
+            }else{
+                return ['status' => false, 'code' => 404, 'message' => __('messages.response.error_404')];
+            }
+        }
+    }    
 
     public function sellRequestList(Request $request){
         $seller_id      = $request->input('seller_id');
@@ -340,5 +471,36 @@ class SellController extends Controller
             $data = ['status' => false, 'code' => 404, 'message' => "data not found"];
         }
         return $data;
+    }
+
+    public function vendorList(Request $request){
+        $post = $request->all();
+        // echo "<pre>"; print_r($post);die;
+        $perameters     = $post;
+        $user_id        = $post['user_id'];
+        $category_id    = $post['category_id'];
+        $subcategory_id = $post['subcategory_id'];
+        $commodity_id   = $post['commodity_id'];
+
+        $vendors = User::with('userCommodity')
+                        ->where('status', '1')->where('id', '!=', $user_id)
+                        ->when ((isset($category_id) && $category_id !== '' && !empty($category_id) ), function ($query) use ($perameters) {
+                            $query->where('category_id', $perameters['category_id']);
+                        })
+                        ->when ((isset($subcategory_id) && $subcategory_id !== '' && !empty($subcategory_id) ), function ($query) use ($perameters) {
+                            $query->where('subcategory_id', $perameters['subcategory_id']);
+                        })
+                        ->whereHas('userCommodity', function($query) use($perameters) {
+                            $commodity_id    = isset($perameters['commodity_id']) ? $perameters['commodity_id'] : 0;
+                            if(isset($commodity_id) && !empty($commodity_id)  && $commodity_id != '' && is_numeric($commodity_id) ){
+                                $query->where('commodity_id', $commodity_id);
+                            }
+                        })
+                        ->get();
+        if(!empty($vendors)){
+            return $vendors;
+        }else{
+            return false;
+        }
     }
 }

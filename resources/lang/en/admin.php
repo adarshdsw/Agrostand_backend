@@ -40,6 +40,24 @@ return [
         'scheme-name' => 'Scheme',
         'brands-name' => 'Brand',
         'datatables-name' => 'Datatable',
+        
+        'units-name' => 'Unit',
+        'pgroups-name' => 'Product Group',
+        'suggestions-name' => 'Suggestion',
+        'drivers-name' => 'Driver',
+        'ebills-name' => 'Ebill',
+        'ebill_shipping-name' => 'Ebill Shipping',
+        'driver_assignments-name' => 'Driver Assignments',
+        'hold_payment-name' => 'Hold Payment',
+        'villages-name' => 'Villages',
+        
+        'agromeets-name' => 'Agromeets',
+        
+        'settings-name' => 'Settings',
+        
+        'bank-name' => 'Bank',
+        
+        'profile-name' => 'Profile',
     ],
     'titles' => [
         'dashboard' => 'Dashboard',
@@ -112,14 +130,17 @@ return [
         'banner' => 'Banner',
         'bannerCreate' => 'Banner Creation',
         'bannerEdit' => 'Banner Edit',
+        'bannerView' => 'Banner View',
 
         'news' => 'News',
         'newsCreate' => 'News Creation',
         'newsEdit' => 'News Edit',
+        'newsView' => 'News View',
 
         'scheme' => 'Scheme',
         'schemeCreate' => 'Scheme Creation',
         'schemeEdit' => 'Scheme Edit',
+        'schemeView' => 'Scheme View',
 
         'brands' => 'Brand',
         'brandCreate' => 'Brand Creation',
@@ -128,6 +149,7 @@ return [
         'users' => 'User',
         'usersCreate' => 'User Creation',
         'usersEdit' => 'User Edit',
+        'usersView' => 'User Informations',
 
         'datatables' => 'Datatable',
         'datatablesCreate' => 'Datatable Creation',
@@ -144,6 +166,36 @@ return [
         'suggestions' => 'Suggestions',
         'suggestionsCreate' => 'Suggestions Creation',
         'suggestionsEdit' => 'Suggestions Edit',
+
+        'drivers' => 'Driver',
+        'driversCreate' => 'Driver Creation',
+        'driversEdit' => 'Driver Edit',
+        'driversView' => 'Driver Information',
+
+        'ebills' => 'Ebill',
+        'ebillsCreate' => 'Ebill Creation',
+        'ebillsEdit' => 'Ebill Edit',
+        'ebillsView' => 'Ebill View',
+        
+        'ebill_shipping' => 'Ebill Shipping',
+        
+        'driver_assignments' => 'Driver Assignments',
+        
+        'AgroPay' => 'Agro Pay',
+        
+        'villages' => 'Villages',
+        'villagesCreate' => 'Village Creation',
+        'villagesEdit' => 'Village Edit',
+        
+        'agromeets' => 'Agromeets',
+        'agromeetsCreate' => 'Agromeet Creation',
+        'agromeetsEdit' => 'Agromeet Edit',
+        
+        'settings' => 'Settings',
+        
+        'bank' => 'Bank',
+        
+        'profile' => 'Profile',
     ],
     'menus' => [
         'dashboard' => 'Dashboard',

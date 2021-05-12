@@ -1,7 +1,11 @@
 @extends('admin/default')
 
-@section('button')
-<!-- <a type="button" href="{{ route('admin.banner.create') }}" class="btn btn-sm btn-outline-primary ml-3 pr-3 pl-3 add-programme">Add Banner</a> -->
+@section('css')
+<style type="text/css">
+	.form-inline .form-control {
+	    width: 100%;
+	}
+</style>
 @endsection
 
 @section('content')
@@ -25,6 +29,99 @@
 					<p> {{ session('fail') }} </p>
 				</div>
 				@endif
+				<!-- filter form start -->
+        		<div class="card card-info">
+        			<div class="card-header">
+        				<h3 class="card-title">Filter Form</h3>
+        			</div>
+        			<!-- /.card-header -->
+        			<!-- form start -->
+        			<div class="card-body">
+        				<form method="POST" id="search-form" class="form-inline" role="form">
+        					<!-- Category id -->
+        					<div class="col-md-4">
+        						<div class="form-group d-flex align-items-center">
+        							<label class="mr-3">Category</label>
+        							<select class="form-control" id="category_id">
+        								<option value="">Select Any</option>
+        								@foreach($categories as $category)
+        									<option value="{{ $category->id }}">{{ $category->title }}</option>
+        								@endforeach
+        							</select>
+        						</div>
+        					</div>
+        					<!-- Assured id -->
+        					<div class="col-md-4">
+        						<div class="form-group d-flex align-items-center">
+        							<label class="mr-3">Assured</label>
+        							<select class="form-control" id="assured_id">
+        								<option value="">Select Any</option>
+        								@foreach($assures as $assure)
+        									<option value="{{ $assure->id }}">{{ $assure->title }}</option>
+        								@endforeach
+        							</select>
+        						</div>
+        					</div>
+        					<!-- Role id -->
+        					<div class="col-md-4">
+        						<div class="form-group d-flex align-items-center">
+        							<label class="mr-3">Role</label>
+        							<select class="form-control" id="role_id">
+        								<option value="">Select Any</option>
+        								@foreach($roles as $role)
+        									<option value="{{ $role->id }}">{{ $role->title }}</option>
+        								@endforeach
+        							</select>
+        						</div>
+        					</div>
+        					<!-- search by name -->
+        					<div class="col-md-4">
+        						<div class="form-group d-flex align-items-center">
+        							<label for="name" class="col-form-label mr-3">User Name</label>
+        							<input type="text" class="form-control" id="name" name="name" placeholder="Search Title">
+        						</div>
+        					</div>
+        					<!-- search by mobile -->
+        					<div class="col-md-4">
+        						<div class="form-group d-flex align-items-center">
+        							<label for="mobile" class="col-form-label mr-3">User Mobile</label>
+        							<input type="text" class="form-control" id="mobile" name="mobile" placeholder="Search Mobile">
+        						</div>
+        					</div>
+        					<!-- Filter by is verfied or not -->
+        					<div class="col-md-4">
+        						<div class="form-group">
+        							<label class="mr-3">Is Verified</label>
+        							<select class="form-control" id="is_verified">
+        								<option value="">Select Any</option>
+        								<option value="1">Yes</option>
+        								<option value="0">No</option>
+        							</select>
+        						</div>
+        					</div>
+        					<div class="col-md-4">
+        						<div class="form-group">
+        							<label class="mr-3">Status</label>
+        							<select class="form-control" id="status">
+        								<option value="">Select Any</option>
+        								<option value="1">Active</option>
+        								<option value="0">Inactive</option>
+        							</select>
+        						</div>
+        					</div>
+
+        					<!-- /.card-body -->
+        					<div class="col-md-2">
+        						<div class="card-footer p-0">
+        							<button type="submit" class="btn btn-info w-100">Search</button>
+        						</div>
+        					</div>
+
+        					<!-- /.card-footer -->
+        				</form>
+        			</div>
+        		</div>
+        		<!-- filter form end -->
 				<div class="card card-primary card-outline card-outline-tabs">
 					<div class="card-body">
 						<table class="table table-hover text-nowrap my-datatable" id="users-table">
@@ -36,47 +133,18 @@
 										<th>Name</th>
 										<th>Email</th>
 										<th>Mobile</th>
+										<th>Unique ID</th>
 										<th>Role</th>
 										<th>Verified</th>
 										<th>Assured</th>
+										<th>Total Reffered</th>
 										<th>Status</th>
+										<th>Created At</th>
 										<th>Action</th>
 									</tr>
 								</thead>
 								<tbody id="banner_panel">
 
-									@php
-									$counter = 1;
-									@endphp
-									@foreach($users as $user)
-									<tr>
-										<td>{{ $counter }}</td>
-										<td><img src="{{ $user->user_image }}" alt="{{ $user->name }}" width="75" height="75"></td>
-										<td>{{ $user->category_id }}</td>
-										<td>{{ $user->name }}</td>
-										<td>{{ $user->email }}</td>
-										<td>{{ $user->mobile }}</td>
-										<td><?= ($user->role_id == 1) ? "<span class='badge bg-success'>Former</span>" : ( ($user->role_id == 2) ? "<span class='badge bg-default'>Business</span>" : "<span class='badge bg-info'>Agronomist</span>") ; ?></td>
-										<td><input type="checkbox" name="is_verified" id="is_verified" value="1" onchange="changeUserVerification(this)" data-user_id="{{ $user->id }}" {{ ($user->is_verified == 1) ? "checked" : "" }}  ></td>
-										<td>
-											<select name="assured_id" id="assured_id" onchange="changeUserAssures(this)" data-user_id="{{ $user->id }}">
-												<option {{ ($user->assured_id == 1) ? "selected" : "" }} value="1">Bronze</option>
-												<option {{ ($user->assured_id == 2) ? "selected" : "" }} value="2">Sliver</option>
-												<option {{ ($user->assured_id == 3) ? "selected" : "" }} value="3">Gold</option>
-												<option {{ ($user->assured_id == 4) ? "selected" : "" }} value="4">Platinum</option>
-											</select>
-										</td>
-										<td><?= ($user->status == 0) ? "<span class='badge bg-danger'>Inactive</span>" : "<span class='badge bg-success'>Active</span>"; ?></td>
-										<td>
-											<a class="btn btn-xs btn-info" href="{{ route('admin.users.show', $user) }}" role="button" title="View"><i class="fas fa-eye"></i></a>
-											<!-- <a class="btn btn-xs btn-success" href="{{ route('admin.users.edit', $user) }}" role="button" title="Edit"><i class="fas fa-pencil-alt"></i></a> -->
-											<!-- <a class="btn btn-xs btn-danger ajax-delete" href="{{ route('admin.users.destroy', $user) }}" role="button" title="Danger" data-user_id="{{$user->id}}" ><i class="fas fa-trash"></i></a> -->
-										</td>
-									</tr>
-									@php
-									$counter++;
-									@endphp
-									@endforeach
 								</tbody>
 							</table>
 						</div>
@@ -95,14 +163,65 @@
 <script>
 
 	$(function () {
-	       $('.my-datatable').DataTable({
-	               "paging": true,
-	               "lengthChange": false,
-	               "searching": false,
-	               "ordering": true,
-	               "info": true,
-	               "autoWidth": true,
-	               "scrollX": true,
+
+		var table = $('#users-table').DataTable({
+			            processing	: true,
+			            serverSide	: true,
+						scrollX		: true,
+			            ajax: {
+				            url: base_url+'/admin/users-data',
+				            method: 'POST',
+				            data: function (d) {
+				                d.category_id 	= $('#category_id :selected').val();
+				                d.assured_id 	= $('#assured_id :selected').val();
+				                d.role_id 		= $('#role_id :selected').val();
+				                d.name  		= $('input[name=name]').val();
+				                d.mobile  		= $('input[name=mobile]').val();
+				                d.status 		= $('#status :selected').val();
+				                d.is_verified 	= $('#is_verified :selected').val();
+				            }
+				        },
+				        columns: [
+						    {data: 'id', 				name: 'users.id'},
+						    {data: 'user_image', 		name: 'users.user_image'},
+						    {data: 'category.title', 	name: 'category.title'},
+						    {data: 'name', 				name: 'users.name'},
+						    {data: 'email', 			name: 'users.email'},
+						    {data: 'mobile', 			name: 'users.mobile'},
+						    {data: 'user_code', 		name: 'users.user_code'},
+						    {data: 'role.title', 		name: 'role.title'},
+						    {data: 'verify', 			name: 'users.verify'},
+						    {data: 'select_assured', 	name: 'select_assured'},
+						    {data: 'total_referred', 	name: 'total_referred'},
+						    {data: 'status', 			name: 'users.status'},
+						    {data: 'created_at', 		name: 'users.created_at'},
+						    {data: 'action', 			name: 'action', orderable: false, searchable: false}
+						]
+			        });
+
+        $('#search-form').on('submit', function(e) {
+	        table.draw();
+	        e.preventDefault();
+	    });
+
+	       $(document).on('change', '.update_status', function(){
+	       		if ($(this).prop('checked')==true){
+					var data = {"user_id" : $(this).data('user_id'), 'user_status':'1' };
+			    }else{
+					var data = {"user_id" : $(this).data('user_id'), 'user_status':'0' };
+			    }
+			    // console.log(data); return false;
+				var url = "{{ route('admin.user.status_update_new') }}";
+				$.ajax({
+					url : url,
+					type : 'GET',
+					data : data,
+					success: function(result){
+						console.log(result);
+						alert('User status update Successfully');
+						
+					}
+				});
 	       });
 	 });
 
@@ -187,6 +306,29 @@ function changeUserVerification(obj){
 		success: function(result){
 			console.log(result);
 			alert('User verification update Successfully');
+			
+		}
+	});
+}
+// change User Status
+function changeUserStatus(obj){
+	var user_status = $(obj);
+	console.log(user_status); return false;
+	var $boxes = $('input[name=is_active]:checked');
+	console.log($boxes); return false;
+	if($boxes.length > 0){
+		var data = {"user_id" : user_status.data('user_id'), 'user_status':'1' };
+	}else{
+		var data = {"user_id" : user_status.data('user_id'), 'user_status':'0' };
+	}
+	var url = "{{ route('admin.user.status_update_new') }}";
+	$.ajax({
+		url : url,
+		type : 'GET',
+		data : data,
+		success: function(result){
+			console.log(result);
+			alert('User status update Successfully');
 			
 		}
 	});

@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use App\Models\Category;
+// use App\Models\City;
+// use App\Models\District;
+// use App\Models\State;
 use App\Models\AgronomistLeadImage;
 
 class Agronomist extends Model
@@ -21,7 +24,7 @@ class Agronomist extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'category_id', 'subcategory_id', 'commodity_id', 'plant_variety', 'description_problem', 'date_of_plantation', 'report', 'upload_report', 'specification'
+        'user_id', 'category_id', 'subcategory_id', 'commodity_id', 'plant_variety', 'description_problem', 'date_of_plantation', 'report', 'upload_report', 'specification', 'is_offer'
     ];
 
     /**
@@ -45,7 +48,7 @@ class Agronomist extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id')->with(['address','commodities','business','assured']);
     }
     /**
      * Get the user which belongs to this product.
@@ -61,8 +64,38 @@ class Agronomist extends Model
      * 
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function psubcategory()
+    {
+        return $this->belongsTo(Category::class, 'subcategory_id', 'id');
+    }
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function commodity()
+    {
+        return $this->belongsTo(Commodity::class, 'commodity_id', 'id');
+    }
+    /**
+     * Get the user which belongs to this product.
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function leadImages()
     {
         return $this->hasMany(AgronomistLeadImage::class, 'agronimist_lead_id', 'id');
     }
+
+    /*public function city(){
+        return $this->belongsTo(City::class, 'city_id', 'city_id');
+    }
+    
+    public function state(){
+        return $this->belongsTo(State::class, 'state_id', 'state_id');
+    }
+    
+    public function district(){
+        return $this->belongsTo(District::class, 'district_id', 'district_id');
+    }*/
 }

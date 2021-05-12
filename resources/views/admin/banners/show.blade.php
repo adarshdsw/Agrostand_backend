@@ -88,7 +88,9 @@
 									<div class="row">
 										<div class="col-md-6">
 											<div class="form-group">
-												<img src="{{ $banner->feature_img }}" alt="{{ $banner->title }}" width="150" height="150">
+												<a href="{{ ($banner->feature_img) ? $banner->feature_img : '' }}" data-toggle="lightbox">
+													<img src="{{ $banner->feature_img }}" alt="{{ $banner->title }}" width="150" height="150">
+												</a>
 											</div>
 										</div>
 										<!-- <div class="col-md-6">
@@ -143,5 +145,9 @@
 	CKEDITOR.replace( 'description' );
 	CKEDITOR.replace( 'description_hindi' );
 	// toastr.success("Have fun storming the castle!", "Miracle Max Says");
+	$(document).on('click', '[data-toggle="lightbox"]', function(event) {
+    	event.preventDefault();
+    	$(this).ekkoLightbox();
+  	});
 </script>
 @endsection

@@ -6,6 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Scheme;
 use App\Models\SchemeImage;
 use Illuminate\Http\Request;
+// notification
+use App\Notifications\NewSchemeCreated;
+use App\Models\User;
+// Datatables
+use DB;
+use DataTables;
 
 class SchemeController extends Controller
 {
@@ -35,9 +41,43 @@ class SchemeController extends Controller
      */
     public function schemeList()
     {
-        $data = [];
-        $schemes = Scheme::all();
-        return view('admin.schemes.index', compact('schemes'));
+        return view('admin.schemes.index');
+    }
+    /**
+     * Get scheme datatable data
+     *
+     *
+     */
+    public function schemeData(Request $request){
+        // get news specific column for datatable
+        $schmes = Scheme::select(['id', 'feature_img', 'title', 'title_hindi', 'description', 'scheme_date', 'status', 'created_at']);
+        // dd($schmes);
+        return DataTables::of($schmes)
+                ->addColumn('feature_img', function ($schmes) {
+                    return '<a href="'.$schmes->feature_img.'" data-toggle="lightbox" ><img src="'.$schmes->feature_img.'" alt="" height="50" ></a>';
+                })
+                ->addColumn('status', function ($schmes) {
+                    return ($schmes->status == 0) ? "<span class='badge bg-danger'>Inactive</span>" : "<span class='badge bg-success'>Active</span>";
+                })
+                ->addColumn('action', function ($schmes) {
+                    $btn_html = '';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-info" href="'.route('admin.scheme.show', $schmes).'" role="button" title="View"><i class="fas fa-eye"></i></a>&nbsp;';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-success" href="'.route('admin.scheme.edit', $schmes).'" role="button" title="Edit"><i class="fas fa-pencil-alt"></i></a>&nbsp;';
+                    $btn_html = $btn_html.'<a class="btn btn-xs btn-danger ajax-delete" href="'.route('admin.scheme.delete', $schmes).'" role="button" title="Delete" data-programme_id="'.$schmes->id.'"><i class="fas fa-trash"></i></a>&nbsp;';
+                    return $btn_html;
+                })
+                ->filter(function ($query) use ($request) {
+                    // filter for title
+                    if ($request->input('title') != '') {
+                        $query->where('title', 'like', "%{$request->input('title')}%");
+                    }
+                    // filter for status
+                    if ($request->input('status') != '') {
+                        $query->where('status', $request->input('status'));
+                    }
+                })
+                ->rawColumns(['status', 'action', 'feature_img'])
+                ->make(true);
     }
 
     /**
@@ -135,6 +175,19 @@ class SchemeController extends Controller
         $res = $scheme->save();
 
         if($res){
+            // list of all users
+            /*$users = User::where('status','1')->get();
+            // if users are not empty
+            if(!empty($users)){
+                foreach($users as $user){
+                    try{
+                        $user->notify(new NewSchemeCreated($scheme));
+                    }catch(Exception $e){
+                        report($e);
+                        return false;
+                    }
+                }
+            }*/
             return redirect(route('admin.scheme.index'))->with('success', __('The Scheme has been successfully added'));
         }else{
             return redirect(route('admin.scheme.index'))->with('fail', __('Something went wrong'));

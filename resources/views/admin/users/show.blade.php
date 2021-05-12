@@ -42,44 +42,45 @@
 								<div class="tab-pane active" id="personal">
 									<form class="form-horizontal">
 										<div class="row">
-											<div class="col-md-6">
+											<div class="col-md-3">
+												<div class="form-group">
+													<a href="{{ ($user->user_image) ? $user->user_image : '' }}" data-toggle="lightbox">
+														<img src="{{ isset($user) ? $user->user_image : '' }}" alt="{{ isset($user) ? $user->name : '' }}" width="150" height="150">
+													</a>
+												</div>
+											</div>
+											<div class="col-md-9">
 												<div class="form-group">
 													<label for="inputName" class="col-form-label">Name</label>
 													<input disabled type="text" class="form-control" id="inputName" placeholder="Name" value="{{ ($user) ? $user->name : '' }}">
 												</div>
 											</div>
+										</div>
+										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
 													<label for="inputEmail" class="col-form-label">Email</label>
 													<input disabled type="text" class="form-control" id="inputEmail" placeholder="Email" value="{{ ($user) ? $user->email : '' }}">
 												</div>
 											</div>
-										</div>
-										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
 													<label for="mobile" class="col-form-label">Mobile</label>
 													<input disabled type="text" class="form-control" id="mobile" placeholder="Name" value="{{ ($user) ? $user->mobile : '' }}">
 												</div>
 											</div>
+										</div>
+										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
 													<label for="category_id" class="col-form-label">User Category</label>
 													<input disabled type="text" class="form-control" id="category_id" placeholder="Name" value="{{ ($user->category) ? $user->category->title : '' }}">
 												</div>
 											</div>
-										</div>
-										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
 													<label for="subcategory_id" class="col-form-label">User Subcategory</label>
 													<input disabled type="text" class="form-control" id="subcategory_id" placeholder="Name" value="{{ ($user->subcategory) ? $user->subcategory->title : '' }}">
-												</div>
-											</div>
-											<div class="col-md-6">
-												<div class="form-group">
-													<label for="commodity_id" class="col-form-label">User Commodity</label>
-													<input disabled type="text" class="form-control" id="commodity_id" placeholder="Name" value="{{ ($user->commodity) ? $user->commodity->title : '' }}">
 												</div>
 											</div>
 										</div>
@@ -125,7 +126,7 @@
 												<label for="commodities" class="col-form-label">User Commodity</label>
 													@if($user->commodities)
 														@foreach($user->commodities as $user_commodity)
-															<span class='badge bg-info'>{{ $user_commodity->commodity->title }}</span>
+															<span class='badge bg-info'>{{ ($user_commodity->commodity) ? $user_commodity->commodity->title : '' }}</span>
 														@endforeach
 													@endif
 											</div>
@@ -154,7 +155,7 @@
 											<div class="col-md-6">
 												<div class="form-group">
 													<label for="land_area_proof" class="col-form-label">Land Area Proof</label>
-													<a href="{{ ($user->address) ? $user->address->land_proof_img : '' }}" alt="{{ ($user->address) ? $user->address->land_area : '' }}"> Land Area Proof</a>
+													<a target="_blank" href="{{ ($user->address) ? $user->address->land_proof_img : '' }}" alt="{{ ($user->address) ? $user->address->land_area : '' }}"> Land Area Proof</a>
 												</div>
 											</div>
 										</div>
@@ -255,7 +256,7 @@
 											<div class="col-md-4">
 												<div class="form-group">
 													<label for="card_img" class="col-form-label">Card Image</label>
-													<a href="{{ ($user->kyc) ? $user->kyc->card_img : '' }}" alt="{{ ($user->kyc) ? $user->kyc->card_number : '' }}"> Card Image</a>
+													<a target="_blank" href="{{ ($user->kyc) ? $user->kyc->card_img : '' }}" alt="{{ ($user->kyc) ? $user->kyc->card_number : '' }}"> Card Image</a>
 												</div>
 											</div>
 										</div>
@@ -292,7 +293,10 @@
 											<div class="col-md-6">
 												<div class="form-group">
 													<label for="passbook_img" class="col-form-label">Passbook Image</label>
-													<a href="{{ ($user->bank) ? $user->bank->passbook_img : '' }}" alt="passbook_img"> Passbook Image</a>
+													<a href="{{ ($user->bank) ? $user->bank->passbook_img : '' }}" data-toggle="lightbox">
+														<img src="{{ ($user->bank) ? $user->bank->passbook_img : '' }}" alt="passbook_img" width="150" height="150">
+													</a>
+													<!-- <a href="{{ ($user->bank) ? $user->bank->passbook_img : '' }}" alt="passbook_img"> Passbook Image</a> -->
 												</div>
 											</div>
 										</div>
@@ -347,6 +351,35 @@
 										<div class="row">
 											<div class="col-md-6">
 												<div class="form-group">
+													<!-- <label for="business_contact" class="col-form-label">Business Contact</label> -->
+													<a target="_blank" href="{{ ($user->business) ? $user->business->business_video_url : '' }}" alt="{{ ($user->business) ? $user->business->business_video_url : '' }}"> Business Video URL</a>
+												</div>
+											</div>
+											<div class="col-md-6">
+												<div class="form-group">
+													<!-- <label for="business_email" class="col-form-label">Business Email</label> -->
+													<a target="_blank" href="{{ ($user->business) ? $user->business->business_image_url : '' }}" alt="{{ ($user->business) ? $user->business->business_image_url : '' }}"> Business Video URL</a>
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-12">
+												<div class="row">
+													@if(isset($user->business->business_docs))
+														@foreach($user->business->business_docs as $docs)
+														<div class="col-md-3">
+															<a href="{{ ($docs) ? $docs->business_doc : '' }}" data-toggle="lightbox">
+																<img src="{{ ($docs) ? $docs->business_doc : '' }}" alt="{{ ($docs) ? $docs->title : '' }}" width="150" height="150">
+															</a>
+														</div>
+														@endforeach
+													@endif
+												</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-6">
+												<div class="form-group">
 													<label for="role_id" class="col-form-label">User Role</label>
 													<select disabled class="form-control" id="role_id" name="role_id">
 														<option value="">--select option--</option>
@@ -366,16 +399,24 @@
 								<div class="tab-pane" id="education">
 									<form class="form-horizontal">
 										<div class="row">
-											<div class="col-md-6">
+											<div class="col-md-4">
 												<div class="form-group">
 													<label for="education_name" class="col-form-label">Education Name</label>
 													<input disabled type="text" class="form-control" id="education_name" placeholder="education_name" value="{{ ($user->education) ? $user->education->education_name : '' }}">
 												</div>
 											</div>
-											<div class="col-md-6">
+											<div class="col-md-4">
 												<div class="form-group">
 													<label for="experience" class="col-form-label">Experience</label>
 													<input disabled type="text" class="form-control" id="experience" placeholder="experience" value="{{ ($user->education) ? $user->education->experience : '' }}">
+												</div>
+											</div>
+											<div class="col-md-4">
+												<div class="form-group">
+													<label for="degree_image" class="col-form-label">Degree Image</label>
+													<a href="{{ ($user->education) ? $user->education->degree_image : '' }}" data-toggle="lightbox">
+														<img src="{{ ($user->education) ? $user->education->degree_image : '' }}" alt="" width="150" height="150">
+													</a>
 												</div>
 											</div>
 										</div>

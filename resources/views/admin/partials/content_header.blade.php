@@ -11,14 +11,12 @@
                @foreach ($breadcrumbs as $item)
                <li @if ($loop->last && $item['url'] === '#') class="active" @endif>
                   @if ($item['url'] !== '#')
-                  <a href="{{ $item['url'] }}">
                   @endif
                      @isset($item['icon'])
                      <span class="fa fa-{{ $item['icon'] }}"></span>
                      @endisset
                      {{ $item['name'] }}
                      @if ($item['url'] !== '#')
-                  </a>
                   / <!-- seperator of breadcrumb-item -->
                   @endif
                </li>&nbsp;
