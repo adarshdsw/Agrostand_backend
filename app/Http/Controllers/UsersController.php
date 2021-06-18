@@ -28,6 +28,9 @@ use App\Notifications\NotifyFollowingUser;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Notifications\DatabaseNotification;
 
+use App\Mail\WelcomeMail;
+use Illuminate\Support\Facades\Mail;
+
 class UsersController extends Controller
 {
 	private $user_next_id;
@@ -354,6 +357,7 @@ class UsersController extends Controller
 		$data['otp_code'] = 123456;
 		$data['created_at'] = date('Y-m-d H:i:s');
 		$data['updated_at'] = date('Y-m-d H:i:s');
+		dd(send_sms($data));
 		$user_otp_id = DB::table('user_otp')->insertGetId($data);
 		if($user_otp_id){
 			$responseArr['status'] = true;
@@ -579,6 +583,10 @@ class UsersController extends Controller
 				}
 				
 				// Notification::send($user, new UserWelcome());
+				if($user->email){
+					$data = $user;
+	   				$res = Mail::to($user->email)->send(new WelcomeMail($data));
+				}
 
 				$responseArr['status'] = true;
 				$responseArr['message'] = __('messages.response.success_user_registration');

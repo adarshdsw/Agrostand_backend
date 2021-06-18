@@ -115,11 +115,18 @@ Route::middleware('localization')->group( function(){
 	Route::post('/post/user/', 'Api\PostController@userPosts')->name('user.own.posts');
 
 	// product master
+	// product Catalogue listing
 	Route::post('/products', 'Api\ProductController@index');
+	// create product Catalogue
 	Route::post('/product/store', 'Api\ProductController@store');
+	// view product Catalogue
 	Route::get('/product/show/{id}', 'Api\ProductController@show');
-	Route::get('/product/group', 'Api\ProductController@productGroup');
+	// Edit product Catalogue
+	Route::post('/product/update', 'Api\ProductController@update');
+	// delete product Catalogue	
 	Route::post('/product/destroy/', 'Api\ProductController@destroy');
+	
+	Route::get('/product/group', 'Api\ProductController@productGroup');
 	// Suggestions of product catalogue
 	Route::post('/user/products', 'Api\ProductController@userProducts');
 	// Buy lead store

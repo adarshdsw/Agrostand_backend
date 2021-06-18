@@ -66,31 +66,31 @@ return [
         	'title' => ':user processed a payment for your ebill.',
         	'body' => 'Check E-bill and take a action on payment process',
         ],
-        'admin_shipping_status' =>[
+        'admin_shipping_status' => [
             'title' => 'AgroStand : Admin :shipping_status shipping request.',
             'body' => 'Admin has been :shipping_status your shipping request.',
         ],
-        'admin_payment_status' =>[
+        'admin_payment_status' => [
             'title' => 'AgroStand : Admin :payment_status payment request.',
             'body' => 'Admin has been :payment_status your payment request.',
         ],
-        'sender_payment_status' =>[
+        'sender_payment_status' => [
             'title' => 'AgroStand : :sender_user :payment_status payment request.',
             'body' => ':sender_user has been :payment_status your payment request.',
         ],
-        'driver_order_receive' =>[
+        'driver_order_receive' => [
             'title' => 'AgroStand : you have been received new order.',
             'body' => ':orde_id order has been assigned you by admin.',
         ],
-        'send_otp' =>[
+        'send_otp' => [
             'title' => 'AgroStand : you have been received a otp.',
             'body' => 'Agrostand sent you a otp :user_otp for :orde_id order.',
         ],
-        'pickup_done' =>[
+        'pickup_done' => [
             'title' => 'AgroStand : pickup done.',
             'body' => 'Your Product has been pickup for an order :orde_id.',
         ],
-        'drop_done' =>[
+        'drop_done' => [
             'title' => 'AgroStand : Drop done.',
             'body' => 'Your Product has been drop for an order :orde_id.',
         ],

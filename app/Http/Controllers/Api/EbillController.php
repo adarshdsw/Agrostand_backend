@@ -28,6 +28,11 @@ use App\Notifications\NotifyPaymentProcessSender;
 use App\Notifications\NotifyPaymentProcessAdmin;
 use App\Notifications\SenderNotifyPaymentStatusReceiver;
 
+use App\Mail\EbillCreatedMail;
+use App\Mail\AdminAgroPayMail;
+use App\Mail\AdminAgroServiceMail;
+use Illuminate\Support\Facades\Mail;
+
 class EbillController extends Controller
 {
     /**
@@ -250,6 +255,15 @@ class EbillController extends Controller
 
             $userTo     = User::find($vendor_id);
             $userFrom   = User::find($user_id);
+
+            // dd($userTo, $ebill);
+
+            if($userTo->email){
+                $mail_data['user'] = $userTo;
+                $mail_data['ebill'] = $ebill;
+                $res = Mail::to($userTo->email)->send(new EbillCreatedMail($mail_data));
+            }
+
             if(!empty($userTo)){
                 $userTo->notify(new NotifyEbillCreated($userFrom, $ebill));
             }
@@ -393,6 +407,7 @@ class EbillController extends Controller
                 $res = $ebill_shipping->save();
 
                 $senderTo = User::find($ebill->user_id);
+
                 if(!empty($senderTo)){
                     $senderTo->notify(new NotifySenderDriverRegistration($driver));
                 }
@@ -404,14 +419,19 @@ class EbillController extends Controller
             }
             // if payment mode AgroPay then Notify to Admin by mail
             if($payment_mode == '3'){
-                if(!empty($adminTo)){
-                    $adminTo->notify(new NotifyAdminAgroPay($ebill));
+
+                if(!empty($adminTo->email)){
+                    $mail_data['ebill'] = $ebill;
+                    $res = Mail::to($adminTo->email)->send(new AdminAgroPayMail($mail_data));
+                    // $adminTo->notify(new NotifyAdminAgroPay($ebill));
                 }
             }
             // if shipping Type AgroSerivce then Notify to Admin by mail
             if($shipping_type == '4'){
                 if(!empty($adminTo)){
-                    $adminTo->notify(new NotifyAdminAgroService($ebill));
+                    // $adminTo->notify(new NotifyAdminAgroService($ebill));
+                    $mail_data['ebill'] = $ebill;
+                    $res = Mail::to($adminTo->email)->send(new AdminAgroServiceMail($mail_data));
                 }
             }
             $data = ['status' => true, 'code' => 200, 'ebill_shipping' => $ebill_shipping, 'message'=>__('messages.response.success_shipping_store')];

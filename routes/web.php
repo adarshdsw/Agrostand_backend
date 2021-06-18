@@ -3,12 +3,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
 
-use Illuminate\Support\Facades\Mail;
 use App\Notifications\AccountActivated;
 use App\Notifications\UserWelcome;
 use App\Notifications\UserLikePost;
 use App\Models\User;
 use App\Models\Ebill;
+
+use App\Mail\WelcomeMail;
+use Illuminate\Support\Facades\Mail;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -132,6 +134,13 @@ Route::get('ebill-pdf_preview', function(){
     }
 });
 
+
+Route::get('welcome_mail', function(){
+   $data = User::where('id', 1)->first();
+   $res = Mail::to('parkhya.developer@gmail.com')->send(new WelcomeMail($data));
+   // dd($res);
+   return 'Email sent Successfully';
+});
 /*
 |--------------------------------------------------------------------------
 | 								Backend

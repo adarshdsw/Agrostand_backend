@@ -165,9 +165,68 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        // dd($request->all());
+        $product_id = $request->input('product_id');
+        $product    = Product::find($product_id);
+        if($product){
+            $product->title        = ($request->input('title')) ? $request->input('title') : '';
+            $product->description  = ($request->input('description')) ? $request->input('description') : '';
+            $product->product_tags = ($request->input('product_tags')) ? $request->input('product_tags') : '';
+            $product->product_url  = ($request->input('product_url')) ? $request->input('product_url') : '';
+            $product->website_url  = ($request->input('website_url')) ? $request->input('website_url') : '';
+            $product->package_size = ($request->input('package_size')) ? $request->input('package_size') : '';
+            $product->package_unit = ($request->input('package_unit')) ? $request->input('package_unit') : '';
+            $product->product_use  = ($request->input('product_use')) ? $request->input('product_use') : '';
+            $product->specification = ($request->input('specification')) ? $request->input('specification') : '';
+            $product->total_amount  = ($request->input('total_amount')) ? $request->input('total_amount') : '0.00';
+            $product->is_offer       = ($request->input('is_offer')) ? '1' : '0';
+            // upload product file / video
+            $file = $request->file('feature_img');
+            if($file){
+                $filename   = $file->getClientOriginalName();
+                $name       = "product";
+                $extension  = $file->extension();
+                $filenew    =  date('d-M-Y').'_'.str_replace($filename,$name,$filename).'_'.time().''.rand(). "." .$extension;
+                $file->move(base_path('/public/uploads/products'), $filenew);
+                $product->feature_img   = asset('/uploads/products/'.$filenew);
+            }
+            $product->status = $request->input('status');
+            $res = $product->save();
+            if($res){
+                // product price
+                $product_price = ProductPrice::find($product->id);
+                if($product_price){
+                    $product_price->approx_price = ($request->input('approx_price')) ? $request->input('approx_price') : '';
+                    $product_price->min_price   =  ($request->input('min_price')) ? $request->input('min_price') : '';
+                    $product_price->max_price   =  ($request->input('max_price')) ? $request->input('max_price') : '';
+                    $product_price->min_qty     =  ($request->input('min_qty')) ? $request->input('min_qty') : '';
+                    $product_price->unit        =  ($request->input('unit')) ? $request->input('unit') : '';
+                    $product_price->last_update = date('Y-m-d');
+                    $res = $product_price->save();
+                }
+
+                if($request->input('is_offer') == 'true'){
+                    $product_offer = ProductOffer::find($product->id);
+                    if($product_offer){
+                        $product_offer->discount    = ($request->input('discount')) ? $request->input('discount') : 0;
+                        $product_offer->amount      = ($request->input('amount')) ? $request->input('amount') : 0;
+                        $product_offer->start_offer = ($request->input('start_offer')) ? $request->input('start_offer') : '';
+                        $product_offer->end_offer   = ($request->input('end_offer')) ? $request->input('end_offer') : '';
+                        $product_offer->offer_day   = ($request->input('offer_day')) ? $request->input('offer_day') : '';
+                        $product_offer->offer_specification   = ($request->input('offer_specification')) ? $request->input('offer_specification') : '';
+                        $res = $product_offer->save();
+                    }
+                }
+                // product offer
+                return ['status' => true, 'code' => 200, 'data'=>$product, 'message'=>__('messages.response.success_product_store')];
+            }else{
+                return ['status' => false, 'code' => 500, 'message' => __('messages.response.failed_product_store')];
+            }
+        }else{
+            return ['status' => false, 'code' => 404, 'message' => __('messages.response.error_404')];
+        }
     }
 
     /**
